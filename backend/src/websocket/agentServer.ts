@@ -1,57 +1,96 @@
-import { ServerWebSocket } from 'bun';
+import { WebSocketServer, WebSocket } from 'ws';
 import { nodeService } from '../services/nodeService';
 
-interface AgentWebSocketData {
-  id: string;
-}
+const PING_INTERVAL_MS = 15000;
+const PONG_TIMEOUT_MS = 30000;
 
-export function setupAgentWebSocket(server: any) {
-  const agents = new Map<string, ServerWebSocket<AgentWebSocketData>>();
+export function setupAgentWebSocket(wss: WebSocketServer) {
+  const agents = new Map<string, { socket: WebSocket; pongTimer?: NodeJS.Timeout; pingTimer?: NodeJS.Timeout }>();
 
-  return {
-    open(ws: ServerWebSocket<AgentWebSocketData>) {
-      console.log('🦀 Agent connected:', ws.data.id);
-      agents.set(ws.data.id, ws);
-    },
+  wss.on('connection', (ws, req) => {
+    const url = new URL(req.url || '', `http://${req.headers.host}`);
+    const agentId = url.searchParams.get('id') || `agent-${Date.now()}`;
 
-    message(ws: ServerWebSocket<AgentWebSocketData>, message: string | Buffer) {
+    console.log('🦀 Agent connected:', agentId);
+    agents.set(agentId, { socket: ws });
+
+    const startPing = () => {
+      const pingTimer = setInterval(() => {
+        if (ws.readyState !== WebSocket.OPEN) return;
+
+        // Only ping if no data in flight to reduce false timeouts
+        ws.ping();
+
+        const pongTimer = setTimeout(() => {
+          console.warn(`⚠️ Agent ${agentId} missed pong, terminating`);
+          ws.terminate();
+        }, PONG_TIMEOUT_MS);
+
+        const record = agents.get(agentId);
+        if (record) {
+          if (record.pongTimer) clearTimeout(record.pongTimer);
+          record.pongTimer = pongTimer;
+          record.pingTimer = pingTimer;
+          agents.set(agentId, record);
+        }
+      }, PING_INTERVAL_MS);
+    };
+
+    ws.on('pong', () => {
+      const record = agents.get(agentId);
+      if (record?.pongTimer) {
+        clearTimeout(record.pongTimer);
+        record.pongTimer = undefined;
+        agents.set(agentId, record);
+      }
+    });
+
+    ws.on('message', (message: WebSocket.RawData) => {
+      // Reset pong timer on any traffic
+      const record = agents.get(agentId);
+      if (record?.pongTimer) {
+        clearTimeout(record.pongTimer);
+        record.pongTimer = undefined;
+        agents.set(agentId, record);
+      }
+
       try {
         const data = JSON.parse(message.toString());
-        
+
         if (data.event === 'node:register') {
           const nodeData = data.data;
           console.log('📝 Agent registered:', nodeData.name);
-          
-          // Add or update node in service
+
           nodeService.addOrUpdateNode(nodeData);
-          
-          // Acknowledge registration
+
           ws.send(JSON.stringify({
             event: 'register:success',
             data: { id: nodeData.id, timestamp: new Date().toISOString() }
           }));
         }
-        
+
         if (data.event === 'node:metrics') {
           const nodeData = data.data;
-          // Update node metrics
           nodeService.addOrUpdateNode(nodeData);
         }
       } catch (error) {
         console.error('Error processing agent message:', error);
       }
-    },
+    });
 
-    close(ws: ServerWebSocket<AgentWebSocketData>) {
-      console.log('🔌 Agent disconnected:', ws.data.id);
-      agents.delete(ws.data.id);
-      
-      // Mark node as offline
-      nodeService.markNodeOffline(ws.data.id);
-    },
+    ws.on('close', () => {
+      console.log('🔌 Agent disconnected:', agentId);
+      const record = agents.get(agentId);
+      if (record?.pingTimer) clearInterval(record.pingTimer);
+      if (record?.pongTimer) clearTimeout(record.pongTimer);
+      agents.delete(agentId);
+      nodeService.markNodeOffline(agentId);
+    });
 
-    error(ws: ServerWebSocket<AgentWebSocketData>, error: Error) {
+    ws.on('error', (error) => {
       console.error('Agent WebSocket error:', error);
-    }
-  };
+    });
+
+    startPing();
+  });
 }

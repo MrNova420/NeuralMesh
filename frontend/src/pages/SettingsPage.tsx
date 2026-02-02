@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Input, Badge } from '../components/ui';
-import Aurora from '../components/react-bits/Aurora';
+import { Button, Input, Badge, StatusDot } from '../components/ui';
+import { Beams, GlassSurface, SpotlightCard, BounceCards, GlitchText, CountUp } from '../components/react-bits';
 import type { FC } from 'react';
+import { apiService } from '../services/api';
 
 export function SettingsPage() {
   const [serverUrl, setServerUrl] = useState('ws://localhost:3001');
@@ -11,6 +12,18 @@ export function SettingsPage() {
   const [theme, setTheme] = useState('dark');
   const [notifications, setNotifications] = useState(true);
   const [autoReconnect, setAutoReconnect] = useState(true);
+  const [systemStatus, setSystemStatus] = useState<{
+    totalNodes: number;
+    activeNodes: number;
+    totalConnections: number;
+    avgCpuUsage: number;
+    avgMemoryUsage: number;
+    totalStorage: number;
+    networkThroughput: number;
+    health: 'healthy' | 'warning' | 'critical';
+  } | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
     console.log('Settings saved:', {
@@ -24,13 +37,50 @@ export function SettingsPage() {
     alert('Settings saved successfully!');
   };
 
+  useEffect(() => {
+    const fetchStatus = async () => {
+      setLoadingStatus(true);
+      setError(null);
+      try {
+        const res = await apiService.getSystemStatus();
+        setSystemStatus(res.data);
+      } catch (e) {
+        setError('Failed to load system status');
+      } finally {
+        setLoadingStatus(false);
+      }
+    };
+    fetchStatus();
+  }, []);
+
+  const bounceCards = useMemo(
+    () => [
+      {
+        title: 'Total Nodes',
+        value: systemStatus ? systemStatus.totalNodes : '--',
+        accent: '#58a6ff',
+      },
+      {
+        title: 'Active',
+        value: systemStatus ? systemStatus.activeNodes : '--',
+        accent: '#3fb950',
+      },
+      {
+        title: 'Connections',
+        value: systemStatus ? systemStatus.totalConnections : '--',
+        accent: '#a371f7',
+      },
+    ],
+    [systemStatus]
+  );
+
   return (
-    <div className="relative min-h-full">
-      <div className="absolute inset-0 pointer-events-none opacity-30">
-        <Aurora />
+    <div className="relative min-h-full overflow-hidden">
+      <div className="absolute inset-0 z-0 opacity-30">
+        <Beams beamNumber={12} beamWidth={1.2} beamHeight={18} speed={1.5} />
       </div>
 
-      <div className="relative z-10 p-6 space-y-6 max-w-4xl">
+      <div className="relative z-10 p-6 space-y-6 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,6 +89,56 @@ export function SettingsPage() {
           <h1 className="text-3xl font-bold text-neural-text mb-2">Settings</h1>
           <p className="text-neutral-text-secondary">Configure your NeuralMesh environment</p>
         </motion.div>
+
+        {/* Live Status */}
+        <GlassSurface className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <StatusDot status={systemStatus?.health || 'warning'} size="md" />
+                <h2 className="text-lg font-semibold text-neural-text">Live System Status</h2>
+              </div>
+              <p className="text-sm text-neutral-text-secondary">
+                Pulled from backend /api/status (real metrics only)
+              </p>
+            </div>
+            <Button variant="secondary" onClick={() => window.location.reload()}>
+              Refresh
+            </Button>
+          </div>
+          {loadingStatus && <p className="text-neutral-text-secondary text-sm">Loading status...</p>}
+          {error && <p className="text-neural-red text-sm">{error}</p>}
+          {systemStatus && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <SpotlightCard
+                title="CPU Avg"
+                value={<CountUp value={systemStatus.avgCpuUsage} suffix="%" />}
+                subtitle="Across live nodes"
+                accent="#58a6ff"
+              />
+              <SpotlightCard
+                title="Memory Avg"
+                value={<CountUp value={systemStatus.avgMemoryUsage} suffix="%" />}
+                subtitle="Current usage"
+                accent="#a371f7"
+              />
+              <SpotlightCard
+                title="Storage"
+                value={<GlitchText text={`${systemStatus.totalStorage} TB`} />}
+                subtitle="Aggregate real storage"
+                accent="#3fb950"
+              />
+              <SpotlightCard
+                title="Throughput"
+                value={<CountUp value={systemStatus.networkThroughput} suffix=" MB/s" />}
+                subtitle="Network rx+tx"
+                accent="#f0a500"
+              />
+            </div>
+          )}
+        </GlassSurface>
+
+        <BounceCards cards={bounceCards} />
 
         {/* Connection Settings */}
         <SettingsSection title="Connection" icon="🔌">

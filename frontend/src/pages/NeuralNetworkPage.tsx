@@ -1,119 +1,75 @@
-import { useState } from 'react';
-import { Beams, Particles } from '../components/react-bits';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Beams, Particles, GlassSurface, SpotlightCard, CountUp } from '../components/react-bits';
 import { NeuralGraph3D } from '../components/neural';
 import { motion } from 'framer-motion';
 import { Badge, StatusDot, Button } from '../components/ui';
-import { Network, Zap, Activity, Maximize2, Minimize2 } from 'lucide-react';
+import { Network, Activity, Maximize2, Minimize2, HardDrive, Cpu, ActivitySquare } from 'lucide-react';
+import { useWebSocket } from '../hooks/useWebSocket';
+import { apiService } from '../services/api';
 
-// Mock node data
-const mockNodes = [
-  {
-    id: 'n1',
-    name: 'alpha-server-01',
-    type: 'alpha' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n2', 'n3', 'n4'],
-  },
-  {
-    id: 'n2',
-    name: 'alpha-server-02',
-    type: 'alpha' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n1', 'n5', 'n6'],
-  },
-  {
-    id: 'n3',
-    name: 'beta-server-01',
-    type: 'beta' as const,
-    status: 'warning' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n1', 'n7', 'n8'],
-  },
-  {
-    id: 'n4',
-    name: 'gamma-mobile-01',
-    type: 'gamma' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n1', 'n9'],
-  },
-  {
-    id: 'n5',
-    name: 'gamma-mobile-02',
-    type: 'gamma' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n2', 'n10'],
-  },
-  {
-    id: 'n6',
-    name: 'delta-pi-01',
-    type: 'delta' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n2', 'n11'],
-  },
-  {
-    id: 'n7',
-    name: 'beta-server-02',
-    type: 'beta' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n3', 'n12'],
-  },
-  {
-    id: 'n8',
-    name: 'gamma-mobile-03',
-    type: 'gamma' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n3'],
-  },
-  {
-    id: 'n9',
-    name: 'delta-pi-02',
-    type: 'delta' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n4'],
-  },
-  {
-    id: 'n10',
-    name: 'delta-pi-03',
-    type: 'delta' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n5'],
-  },
-  {
-    id: 'n11',
-    name: 'gamma-mobile-04',
-    type: 'gamma' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n6'],
-  },
-  {
-    id: 'n12',
-    name: 'alpha-server-03',
-    type: 'alpha' as const,
-    status: 'healthy' as const,
-    position: [0, 0, 0] as [number, number, number],
-    connections: ['n7', 'n1'],
-  },
-];
+type NodeType = 'alpha' | 'beta' | 'gamma' | 'delta';
+type NodeStatus = 'healthy' | 'warning' | 'critical' | 'offline';
+
+interface MeshNode {
+  id: string;
+  name: string;
+  type: NodeType;
+  status: NodeStatus;
+  connections: string[];
+  specs: {
+    cpu: { usage: number };
+    memory: { usage: number; used?: number };
+    storage: { usage: number; used?: number };
+    network: { rx: number; tx: number };
+  };
+  uptime?: number;
+}
 
 export function NeuralNetworkPage() {
+  const [nodes, setNodes] = useState<MeshNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const handleNodeClick = (nodeId: string) => {
-    setSelectedNode(nodeId);
-  };
+  const { on, off, emit } = useWebSocket({
+    onConnect: () => emit('nodes:subscribe'),
+  });
 
-  const selectedNodeData = mockNodes.find((n) => n.id === selectedNode);
+  useEffect(() => {
+    const fetchInitial = async () => {
+      try {
+        const res = await apiService.getAllNodes();
+        setNodes(res.data.nodes);
+      } catch (e) {
+        console.error('Failed to load nodes', e);
+      }
+    };
+    fetchInitial();
+  }, []);
+
+  useEffect(() => {
+    const handleNodes = (data: { nodes: MeshNode[] }) => setNodes(data.nodes);
+    on('nodes:initial', handleNodes);
+    on('nodes:update', handleNodes);
+    return () => {
+      off('nodes:initial', handleNodes);
+      off('nodes:update', handleNodes);
+    };
+  }, [on, off]);
+
+  const graphNodes = useMemo(
+    () =>
+      nodes.map((n, idx) => ({
+        ...n,
+        position: [Math.cos(idx) * 6, Math.sin(idx * 1.3) * 4, Math.sin(idx) * 6] as [
+          number,
+          number,
+          number,
+        ],
+      })),
+    [nodes]
+  );
+
+  const selectedNodeData = nodes.find((n) => n.id === selectedNode);
 
   return (
     <div className="relative h-full overflow-hidden">
@@ -185,61 +141,44 @@ export function NeuralNetworkPage() {
         {/* Network Stats Cards (hide in fullscreen) */}
         {!isFullscreen && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="bg-neural-panel/80 backdrop-blur-sm border border-neural-blue/30 rounded-lg p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-neural-blue/20 rounded-lg">
-                  <Network className="h-6 w-6 text-neural-blue" />
+            <SpotlightCard
+              title="Total Nodes"
+              subtitle="Live mesh members"
+              value={<CountUp value={nodes.length || 0} />}
+              accent="#58a6ff"
+            />
+            <SpotlightCard
+              title="Active Connections"
+              subtitle="Aggregate links"
+              value={<CountUp value={nodes.reduce((sum, n) => sum + n.connections.length, 0)} />}
+              accent="#3fb950"
+            />
+            <SpotlightCard
+              title="Network Health"
+              subtitle="Status across nodes"
+              value={
+                <div className="flex items-center gap-2">
+                  <StatusDot
+                    status={
+                      nodes.some((n) => n.status === 'critical')
+                        ? 'critical'
+                        : nodes.some((n) => n.status === 'warning')
+                        ? 'warning'
+                        : 'healthy'
+                    }
+                    size="md"
+                  />
+                  <span className="text-neural-text">
+                    {nodes.some((n) => n.status === 'critical')
+                      ? 'Critical'
+                      : nodes.some((n) => n.status === 'warning')
+                      ? 'Watch'
+                      : 'Optimal'}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-sm text-neutral-text-secondary">Total Nodes</p>
-                  <p className="text-2xl font-bold text-neural-blue">{mockNodes.length}</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-              className="bg-neural-panel/80 backdrop-blur-sm border border-neural-green/30 rounded-lg p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-neural-green/20 rounded-lg">
-                  <Zap className="h-6 w-6 text-neural-green" />
-                </div>
-                <div>
-                  <p className="text-sm text-neutral-text-secondary">Active Connections</p>
-                  <p className="text-2xl font-bold text-neural-green">
-                    {mockNodes.reduce((sum, n) => sum + n.connections.length, 0)}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-              className="bg-neural-panel/80 backdrop-blur-sm border border-neural-purple/30 rounded-lg p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-neural-purple/20 rounded-lg">
-                  <Activity className="h-6 w-6 text-neural-purple" />
-                </div>
-                <div>
-                  <p className="text-sm text-neutral-text-secondary">Network Health</p>
-                  <div className="flex items-center gap-2">
-                    <StatusDot status="healthy" size="md" />
-                    <p className="text-2xl font-bold text-neural-purple">Optimal</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              }
+              accent="#a371f7"
+            />
           </div>
         )}
 
@@ -248,48 +187,113 @@ export function NeuralNetworkPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className={`flex-1 bg-neural-panel/60 backdrop-blur-sm border border-neural-border rounded-lg overflow-hidden ${
-            isFullscreen ? 'h-screen' : ''
-          }`}
+          className={`flex-1 relative overflow-hidden`}
         >
-          <NeuralGraph3D nodes={mockNodes} onNodeClick={handleNodeClick} />
+          <GlassSurface
+            className={`h-full border border-neural-border/60 ${
+              isFullscreen ? 'rounded-none' : 'rounded-lg'
+            }`}
+          >
+            <NeuralGraph3D nodes={graphNodes} onNodeClick={handleNodeClick} />
 
-          {/* Node Detail Panel */}
-          {selectedNodeData && (
-            <div className="absolute bottom-6 left-6 bg-neural-panel/95 backdrop-blur-sm border border-neural-border rounded-lg p-4 max-w-sm">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-neural-text">{selectedNodeData.name}</h3>
-                <button
-                  onClick={() => setSelectedNode(null)}
-                  className="text-neutral-text-secondary hover:text-neural-text"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
+            {/* Node Detail Panel */}
+            {selectedNodeData && (
+              <div className="absolute bottom-6 left-6 bg-neural-panel/95 backdrop-blur-sm border border-neural-border rounded-lg p-4 max-w-md space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-neural-text">{selectedNodeData.name}</h3>
+                    <p className="text-xs text-neutral-text-secondary">
+                      {selectedNodeData.connections.length} connections • {formatUptime(selectedNodeData.uptime || 0)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedNode(null)}
+                    className="text-neutral-text-secondary hover:text-neural-text"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
                   <StatusDot status={selectedNodeData.status} size="sm" />
                   <span className="text-neutral-text-secondary">Status:</span>
                   <span className="text-neural-text capitalize">{selectedNodeData.status}</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <Badge variant="info">{selectedNodeData.type.toUpperCase()}</Badge>
-                  <span className="text-neutral-text-secondary">
-                    {selectedNodeData.connections.length} connections
-                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <MetricChip
+                    icon={<Cpu className="h-4 w-4 text-neural-blue" />}
+                    label="CPU"
+                    value={`${selectedNodeData.specs.cpu.usage.toFixed(1)}%`}
+                  />
+                  <MetricChip
+                    icon={<ActivitySquare className="h-4 w-4 text-neural-purple" />}
+                    label="Memory"
+                    value={`${selectedNodeData.specs.memory.usage.toFixed(1)}%`}
+                    helper={formatBytes(selectedNodeData.specs.memory.used ?? 0)}
+                  />
+                  <MetricChip
+                    icon={<HardDrive className="h-4 w-4 text-neural-green" />}
+                    label="Storage"
+                    value={`${selectedNodeData.specs.storage.usage.toFixed(1)}%`}
+                    helper={formatBytes(selectedNodeData.specs.storage.used ?? 0)}
+                  />
+                  <MetricChip
+                    icon={<Activity className="h-4 w-4 text-neural-orange" />}
+                    label="Network"
+                    value={`${(selectedNodeData.specs.network.rx + selectedNodeData.specs.network.tx).toFixed(2)} MB/s`}
+                    helper={`↓ ${selectedNodeData.specs.network.rx.toFixed(2)} • ↑ ${selectedNodeData.specs.network.tx.toFixed(2)}`}
+                  />
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Controls hint */}
-          <div className="absolute top-4 left-4 bg-neural-panel/95 backdrop-blur-sm border border-neural-border rounded-lg px-3 py-2 text-xs text-neutral-text-secondary">
-            🖱️ Click + Drag to rotate • Scroll to zoom • Click nodes for details
-          </div>
+            {/* Controls hint */}
+            <div className="absolute top-4 left-4 bg-neural-panel/95 backdrop-blur-sm border border-neural-border rounded-lg px-3 py-2 text-xs text-neutral-text-secondary">
+              🖱️ Click + Drag to rotate • Scroll to zoom • Click nodes for details
+            </div>
+          </GlassSurface>
         </motion.div>
       </div>
     </div>
   );
 }
 
+function MetricChip({
+  icon,
+  label,
+  value,
+  helper,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  helper?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg bg-neural-bg-secondary/80 border border-neural-border">
+      <div className="mt-0.5">{icon}</div>
+      <div className="space-y-0.5">
+        <p className="text-xs text-neutral-text-secondary">{label}</p>
+        <p className="text-sm font-semibold text-neural-text">{value}</p>
+        {helper && <p className="text-[11px] text-neutral-text-secondary">{helper}</p>}
+      </div>
+    </div>
+  );
+}
 
+function formatBytes(bytes: number): string {
+  if (!bytes) return '0 B';
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const val = bytes / Math.pow(1024, i);
+  return `${val.toFixed(1)} ${sizes[i]}`;
+}
+
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins}m`;
+}

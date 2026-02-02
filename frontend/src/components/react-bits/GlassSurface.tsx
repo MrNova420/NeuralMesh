@@ -48,9 +48,9 @@ const useDarkMode = () => {
     if (typeof window === 'undefined') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDark(mediaQuery.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    const update = (mq: MediaQueryList | MediaQueryListEvent) => setIsDark(mq.matches);
+    update(mediaQuery);
+    const handler = (e: MediaQueryListEvent) => update(e);
     mediaQuery.addEventListener('change', handler);
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
@@ -163,7 +163,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
 
   useEffect(() => {
     setSvgSupported(supportsSVGFilters());
-  }, []);
+  }, [supportsSVGFilters]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -191,11 +191,11 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [updateDisplacementMap]);
 
   useEffect(() => {
     setTimeout(updateDisplacementMap, 0);
-  }, [width, height]);
+  }, [width, height, updateDisplacementMap]);
 
   const supportsSVGFilters = () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {

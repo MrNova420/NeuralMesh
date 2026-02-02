@@ -9,3 +9,4 @@ export { default as BounceCards } from './BounceCards';
 export { default as SpotlightCard } from './SpotlightCard';
 export { default as Dock } from './Dock';
 export { default as GlassSurface } from './GlassSurface';
+export { default as GlitchText } from './GlitchText';

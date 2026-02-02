@@ -30,6 +30,7 @@ app.route('/api/metrics', metricsRouter);
 app.route('/api/status', statusRouter);
 
 const PORT = process.env.PORT || 3001;
+const USE_MOCK_NODES = process.env.USE_MOCK_NODES === 'true';
 
 // Bun server with WebSocket support for agents
 Bun.serve({
@@ -60,5 +61,6 @@ Bun.serve({
 
 console.log(`🚀 NeuralMesh API on http://localhost:${PORT}`);
 console.log(`🦀 Agent WebSocket at ws://localhost:${PORT}/agent`);
+console.log(`📦 Mock nodes: ${USE_MOCK_NODES ? 'ENABLED' : 'DISABLED'}`);
 
 export default app;

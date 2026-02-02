@@ -2,18 +2,33 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { DeviceGrid, NodeDetailModal, Button, Input } from '../components/ui';
 import Particles from '../components/react-bits/Particles';
+import { GlassSurface, Dock } from '../components/react-bits';
+import { Server, Cpu, Wifi } from 'lucide-react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { apiService } from '../services/api';
 
+type NodeType = 'alpha' | 'beta' | 'gamma' | 'delta';
+type NodeStatus = 'healthy' | 'warning' | 'critical' | 'offline';
+
+interface MeshNode {
+  id: string;
+  name: string;
+  type: NodeType;
+  status: NodeStatus;
+  connections: string[];
+  platform: { hostname: string };
+  location: { ip: string };
+}
+
 export function NodesPage() {
-  const [nodes, setNodes] = useState<any[]>([]);
-  const [filteredNodes, setFilteredNodes] = useState<any[]>([]);
-  const [selectedNode, setSelectedNode] = useState<any | null>(null);
+  const [nodes, setNodes] = useState<MeshNode[]>([]);
+  const [filteredNodes, setFilteredNodes] = useState<MeshNode[]>([]);
+  const [selectedNode, setSelectedNode] = useState<MeshNode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'alpha' | 'beta' | 'gamma' | 'delta'>('all');
   const [loading, setLoading] = useState(true);
 
-  const { isConnected, on, emit } = useWebSocket({
+  const { isConnected, on, off, emit } = useWebSocket({
     onConnect: () => {
       emit('nodes:subscribe');
     },
@@ -36,19 +51,8 @@ export function NodesPage() {
     fetchNodes();
   }, []);
 
-  // Listen for real-time updates
-  useEffect(() => {
-    const handleNodesUpdate = (data: { nodes: any[] }) => {
-      setNodes(data.nodes);
-      applyFilters(data.nodes, searchQuery, filterType);
-    };
-
-    on('nodes:update', handleNodesUpdate);
-    on('nodes:initial', handleNodesUpdate);
-  }, [on, searchQuery, filterType]);
-
   // Apply search and type filters
-  const applyFilters = (nodeList: any[], query: string, type: string) => {
+  const applyFilters = (nodeList: MeshNode[], query: string, type: 'all' | NodeType) => {
     let filtered = nodeList;
 
     if (type !== 'all') {
@@ -66,6 +70,21 @@ export function NodesPage() {
 
     setFilteredNodes(filtered);
   };
+
+  // Listen for real-time updates
+  useEffect(() => {
+    const handleNodesUpdate = (data: { nodes: MeshNode[] }) => {
+      setNodes(data.nodes);
+      applyFilters(data.nodes, searchQuery, filterType);
+    };
+
+    on('nodes:update', handleNodesUpdate);
+    on('nodes:initial', handleNodesUpdate);
+    return () => {
+      off('nodes:update', handleNodesUpdate);
+      off('nodes:initial', handleNodesUpdate);
+    };
+  }, [on, off, searchQuery, filterType]);
 
   useEffect(() => {
     applyFilters(nodes, searchQuery, filterType);
@@ -113,32 +132,34 @@ export function NodesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h1 className="text-3xl font-bold text-neural-text">Nodes</h1>
-              <p className="text-neutral-text-secondary">
-                Manage and monitor all connected devices
-                {isConnected && <span className="ml-2 text-neural-green">● Live</span>}
-              </p>
+          <GlassSurface className="p-4 border border-neural-border/60">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h1 className="text-3xl font-bold text-neural-text">Nodes</h1>
+                <p className="text-neutral-text-secondary">
+                  Manage and monitor all connected devices
+                  {isConnected && <span className="ml-2 text-neural-green">● Live</span>}
+                </p>
+              </div>
+              <Button variant="primary" size="sm">
+                + Add Node
+              </Button>
             </div>
-            <Button variant="primary" size="sm">
-              + Add Node
-            </Button>
-          </div>
+          </GlassSurface>
         </motion.div>
 
         {/* Stats Bar */}
-        <div className="flex flex-wrap gap-4 p-4 bg-neural-bg-secondary/50 backdrop-blur-sm rounded-lg border border-neural-border">
+        <GlassSurface className="p-4 border border-neural-border/60 flex flex-wrap gap-4">
           <StatBadge label="Total" value={stats.total} color="blue" />
           <StatBadge label="Alpha" value={stats.alpha} color="blue" />
           <StatBadge label="Beta" value={stats.beta} color="purple" />
           <StatBadge label="Gamma" value={stats.gamma} color="green" />
           <StatBadge label="Delta" value={stats.delta} color="orange" />
           <StatBadge label="Healthy" value={stats.healthy} color="green" />
-        </div>
+        </GlassSurface>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4">
+        <GlassSurface className="p-4 border border-neural-border/60 flex flex-wrap gap-4">
           <Input
             placeholder="Search nodes..."
             value={searchQuery}
@@ -172,21 +193,23 @@ export function NodesPage() {
               label="Delta"
             />
           </div>
-        </div>
+        </GlassSurface>
 
         {/* Device Grid */}
-        {filteredNodes.length > 0 ? (
-          <DeviceGrid nodes={filteredNodes} onNodeClick={handleNodeClick} />
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-neutral-text-secondary text-lg">No nodes found</p>
-            <p className="text-neutral-text-secondary text-sm mt-2">
-              {searchQuery || filterType !== 'all'
-                ? 'Try adjusting your filters'
-                : 'Add your first node to get started'}
-            </p>
-          </div>
-        )}
+        <GlassSurface className="p-2 border border-neural-border/60">
+          {filteredNodes.length > 0 ? (
+            <DeviceGrid nodes={filteredNodes} onNodeClick={handleNodeClick} />
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-neutral-text-secondary text-lg">No nodes found</p>
+              <p className="text-neutral-text-secondary text-sm mt-2">
+                {searchQuery || filterType !== 'all'
+                  ? 'Try adjusting your filters'
+                  : 'Add your first node to get started'}
+              </p>
+            </div>
+          )}
+        </GlassSurface>
       </div>
 
       {/* Node Detail Modal */}
@@ -195,6 +218,26 @@ export function NodesPage() {
         isOpen={!!selectedNode}
         onClose={() => setSelectedNode(null)}
         onAction={handleNodeAction}
+      />
+
+      <Dock
+        items={[
+          {
+             icon: <Server className="h-5 w-5 text-neural-green" />,
+             label: 'Nodes',
+             onClick: () => window.location.assign('/nodes'),
+           },
+           {
+             icon: <Cpu className="h-5 w-5 text-neural-blue" />,
+             label: 'Metrics',
+             onClick: () => window.location.assign('/'),
+           },
+          {
+            icon: <Wifi className="h-5 w-5 text-neural-purple" />,
+            label: isConnected ? 'Live' : 'Reconnect',
+            onClick: () => emit('nodes:subscribe'),
+          },
+        ]}
       />
     </div>
   );

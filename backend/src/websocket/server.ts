@@ -24,7 +24,7 @@ export function setupWebSocket(io: Server) {
       
       // Send updates every 2 seconds
       const interval = setInterval(() => {
-        // Update all node metrics
+        // Update mock nodes only when enabled (real nodes handled by agent)
         nodeService.updateAllNodes();
         
         // Check for health issues

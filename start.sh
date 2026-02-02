@@ -8,12 +8,19 @@ echo ""
 if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
     echo "⚠️  Backend already running on port 3001"
 else
-    echo "🔥 Starting Backend..."
+    echo "🔥 Starting Backend (Node)..."
     cd ~/neuralmesh/backend
-    bun run index-ws.ts > /tmp/neuralmesh-backend.log 2>&1 &
+    npm run dev > /tmp/neuralmesh-backend.log 2>&1 &
     BACKEND_PID=$!
     echo "   Backend PID: $BACKEND_PID"
     sleep 2
+fi
+
+# Check if agent websocket port is running
+if lsof -Pi :4001 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo "⚠️  Agent WS already running on port 4001"
+else
+    echo "🔌 Agent WS running on port 4001 (via backend dev script)"
 fi
 
 # Check if frontend is already running

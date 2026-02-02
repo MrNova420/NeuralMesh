@@ -1,12 +1,13 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serve } from '@hono/node-server';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
 import nodesRouter from './src/routes/nodes';
 import metricsRouter from './src/routes/metrics';
 import statusRouter from './src/routes/status';
 import { setupWebSocket } from './src/websocket/server';
+import { setupAgentWebSocket } from './src/websocket/agentServer';
 
 const app = new Hono();
 
@@ -44,6 +45,7 @@ app.onError((err, c) => {
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+const agentPort = process.env.AGENT_PORT ? parseInt(process.env.AGENT_PORT) : 4001;
 
 // Create HTTP server
 const server = createServer((req, res) => {
@@ -74,8 +76,17 @@ const io = new Server(server, {
 
 setupWebSocket(io);
 
+// Raw WebSocket server for agents (dedicated port to avoid upgrade conflicts)
+const agentWss = new WebSocketServer({
+  port: agentPort,
+  path: '/agent',
+  perMessageDeflate: false,
+});
+setupAgentWebSocket(agentWss);
+
 // Start server
 server.listen(port, () => {
   console.log(`🚀 NeuralMesh API with WebSocket on http://localhost:${port}`);
-  console.log(`🔌 WebSocket ready at ws://localhost:${port}`);
+  console.log(`🔌 Socket.IO ready at ws://localhost:${port}`);
+  console.log(`🦀 Agent WebSocket ready at ws://localhost:${agentPort}/agent`);
 });

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 
@@ -9,7 +9,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, error, label, id, ...props }, ref) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const autoId = useId();
+    const inputId = id || `input-${autoId}`;
     
     return (
       <div className="w-full">

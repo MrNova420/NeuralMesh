@@ -7,3 +7,7 @@ dist/
 coverage/
 .vscode/
 .idea/
+
+# Rust build artifacts
+agent/target/
+Cargo.lock

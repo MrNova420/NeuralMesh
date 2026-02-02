@@ -195,6 +195,7 @@ async fn main() -> Result<()> {
     println!("✅ Connected to server");
 
     let (mut write, mut read) = ws_stream.split();
+    let mut last_heartbeat = std::time::Instant::now();
 
     // Send initial node registration
     let node_info = collect_metrics(&mut sys, &node_id, start_time)?;
@@ -212,7 +213,7 @@ async fn main() -> Result<()> {
     write.send(Message::Text(register_msg.to_string())).await?;
     println!("📝 Registered with server");
 
-    // Main loop: send metrics periodically
+    // Main loop: send metrics periodically and respond to pings
     loop {
         tokio::select! {
             _ = update_interval.tick() => {
@@ -237,10 +238,18 @@ async fn main() -> Result<()> {
             
             msg = read.next() => {
                 match msg {
+                    Some(Ok(Message::Ping(payload))) => {
+                        write.send(Message::Pong(payload)).await.ok();
+                        last_heartbeat = std::time::Instant::now();
+                    }
+                    Some(Ok(Message::Pong(_))) => {
+                        last_heartbeat = std::time::Instant::now();
+                    }
                     Some(Ok(Message::Text(text))) => {
                         if text.contains("register:success") {
                             println!("\n✅ Registration confirmed");
                         }
+                        last_heartbeat = std::time::Instant::now();
                     }
                     Some(Ok(Message::Close(_))) => {
                         println!("\n🔌 Server closed connection");
@@ -254,6 +263,12 @@ async fn main() -> Result<()> {
                     _ => {}
                 }
             }
+        }
+
+        // Heartbeat safety: if no traffic for 3 minutes, exit to reconnect
+        if last_heartbeat.elapsed() > Duration::from_secs(180) {
+            eprintln!("\n⚠️ No heartbeat in 3 minutes, closing to reconnect");
+            break;
         }
     }
 

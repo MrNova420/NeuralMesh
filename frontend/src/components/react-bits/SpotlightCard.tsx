@@ -8,12 +8,20 @@ interface Position {
 interface SpotlightCardProps extends React.PropsWithChildren {
   className?: string;
   spotlightColor?: `rgba(${number}, ${number}, ${number}, ${number})`;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  value?: React.ReactNode;
+  accent?: string;
 }
 
 const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,
   className = '',
-  spotlightColor = 'rgba(255, 255, 255, 0.25)'
+  spotlightColor = 'rgba(255, 255, 255, 0.25)',
+  title,
+  subtitle,
+  value,
+  accent = '#58a6ff',
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -59,9 +67,22 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out"
         style={{
           opacity,
-          background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`
+          background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`,
         }}
       />
+      {(title || subtitle || value) ? (
+        <div className="space-y-2">
+          <p className="text-sm text-neutral-400">{subtitle}</p>
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ backgroundColor: accent }}
+            />
+            {title}
+          </h3>
+          <div className="text-3xl font-bold text-white">{value}</div>
+        </div>
+      ) : null}
       {children}
     </div>
   );

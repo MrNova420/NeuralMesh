@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
@@ -57,7 +57,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
   }, [autoConnect, onConnect, onDisconnect, onError]);
 
-  const emit = (event: string, data?: any) => {
+  const emit = <T,>(event: string, data?: T) => {
     if (!socketRef.current) {
       console.warn('⚠️  Socket not connected');
       return;
@@ -65,12 +65,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     socketRef.current.emit(event, data);
   };
 
-  const on = (event: string, callback: (data: any) => void) => {
+  const on = <T,>(event: string, callback: (data: T) => void) => {
     if (!socketRef.current) return;
     socketRef.current.on(event, callback);
   };
 
-  const off = (event: string, callback?: (data: any) => void) => {
+  const off = <T,>(event: string, callback?: (data: T) => void) => {
     if (!socketRef.current) return;
     if (callback) {
       socketRef.current.off(event, callback);
@@ -79,12 +79,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     }
   };
 
-  return {
-    socket: socketRef.current,
-    isConnected,
-    error,
-    emit,
-    on,
-    off,
-  };
+  const api = useMemo(
+    () => ({
+      get socket() {
+        return socketRef.current;
+      },
+      isConnected,
+      error,
+      emit,
+      on,
+      off,
+    }),
+    [isConnected, error]
+  );
+
+  return api;
 }
