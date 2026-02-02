@@ -11,3 +11,5 @@ export { ActivityFeed } from './ActivityFeed';
 export { QuickActions } from './QuickActions';
 export { NodeStatusList } from './NodeStatusList';
 export { MetricChart } from './MetricChart';
+export { DeviceGrid } from './DeviceGrid';
+export { NodeDetailModal } from './NodeDetailModal';

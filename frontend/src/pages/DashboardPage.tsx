@@ -126,17 +126,17 @@ export function DashboardPage() {
   const activities = [
     {
       id: '1',
-      type: 'node_join' as const,
+      type: 'optimization' as 'node_join' | 'node_leave' | 'deployment' | 'alert' | 'optimization',
       message: `Real-time updates ${isConnected ? 'active' : 'inactive'}`,
       timestamp: new Date(),
-      status: (isConnected ? 'healthy' : 'warning') as const,
+      status: (isConnected ? 'healthy' : 'warning') as 'healthy' | 'warning' | 'critical' | 'offline',
     },
     {
       id: '2',
-      type: 'deployment' as const,
+      type: 'deployment' as 'node_join' | 'node_leave' | 'deployment' | 'alert' | 'optimization',
       message: `Connected to ${nodes.length} nodes`,
       timestamp: new Date(Date.now() - 5000),
-      status: 'healthy' as const,
+      status: 'healthy' as 'healthy' | 'warning' | 'critical' | 'offline',
     },
   ];
 
