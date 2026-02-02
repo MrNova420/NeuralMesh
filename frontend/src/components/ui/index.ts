@@ -13,3 +13,4 @@ export { NodeStatusList } from './NodeStatusList';
 export { MetricChart } from './MetricChart';
 export { DeviceGrid } from './DeviceGrid';
 export { NodeDetailModal } from './NodeDetailModal';
+export { AlertCenter } from './AlertCenter';

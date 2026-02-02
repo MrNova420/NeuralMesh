@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { nodeService } from '../services/nodeService';
+import { alertService } from '../services/alertService';
 
 export function setupWebSocket(io: Server) {
   io.on('connection', (socket) => {
@@ -11,6 +12,12 @@ export function setupWebSocket(io: Server) {
       timestamp: new Date().toISOString(),
     });
 
+    // Send initial alerts
+    socket.emit('alerts:initial', {
+      alerts: alertService.getAll(),
+      unread: alertService.getUnread().length,
+    });
+
     // Handle node subscription
     socket.on('nodes:subscribe', () => {
       console.log(`📊 Client ${socket.id} subscribed to node updates`);
@@ -20,9 +27,18 @@ export function setupWebSocket(io: Server) {
         // Update all node metrics
         nodeService.updateAllNodes();
         
+        // Check for health issues
+        const nodes = nodeService.getAllNodes();
+        nodes.forEach((node) => {
+          const alert = alertService.checkNodeHealth(node);
+          if (alert) {
+            io.emit('alert:new', alert);
+          }
+        });
+        
         // Send updated data
         socket.emit('nodes:update', {
-          nodes: nodeService.getAllNodes(),
+          nodes,
           timestamp: new Date().toISOString(),
         });
       }, 2000);
@@ -59,6 +75,29 @@ export function setupWebSocket(io: Server) {
           timestamp: new Date().toISOString(),
         });
       }
+    });
+
+    // Alert management
+    socket.on('alerts:getAll', () => {
+      socket.emit('alerts:list', {
+        alerts: alertService.getAll(),
+      });
+    });
+
+    socket.on('alert:markRead', (data: { id: string }) => {
+      alertService.markAsRead(data.id);
+      socket.emit('alerts:updated', {
+        alerts: alertService.getAll(),
+        unread: alertService.getUnread().length,
+      });
+    });
+
+    socket.on('alerts:markAllRead', () => {
+      alertService.markAllAsRead();
+      socket.emit('alerts:updated', {
+        alerts: alertService.getAll(),
+        unread: 0,
+      });
     });
 
     socket.on('disconnect', () => {
