@@ -1,0 +1,70 @@
+import { Server } from 'socket.io';
+import { nodeService } from '../services/nodeService';
+
+export function setupWebSocket(io: Server) {
+  io.on('connection', (socket) => {
+    console.log(`✅ Client connected: ${socket.id}`);
+
+    // Send initial data
+    socket.emit('nodes:initial', {
+      nodes: nodeService.getAllNodes(),
+      timestamp: new Date().toISOString(),
+    });
+
+    // Handle node subscription
+    socket.on('nodes:subscribe', () => {
+      console.log(`📊 Client ${socket.id} subscribed to node updates`);
+      
+      // Send updates every 2 seconds
+      const interval = setInterval(() => {
+        // Update all node metrics
+        nodeService.updateAllNodes();
+        
+        // Send updated data
+        socket.emit('nodes:update', {
+          nodes: nodeService.getAllNodes(),
+          timestamp: new Date().toISOString(),
+        });
+      }, 2000);
+
+      // Clean up on disconnect
+      socket.on('disconnect', () => {
+        clearInterval(interval);
+        console.log(`❌ Client disconnected: ${socket.id}`);
+      });
+    });
+
+    // Handle metrics request
+    socket.on('metrics:request', (data: { nodeId?: string }) => {
+      if (data.nodeId) {
+        const node = nodeService.getNodeById(data.nodeId);
+        if (node) {
+          socket.emit('metrics:response', {
+            nodeId: data.nodeId,
+            metrics: node.specs,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      } else {
+        // Send all metrics
+        const nodes = nodeService.getAllNodes();
+        socket.emit('metrics:response', {
+          metrics: nodes.map(n => ({
+            nodeId: n.id,
+            cpu: n.specs.cpu.usage,
+            memory: n.specs.memory.usage,
+            storage: n.specs.storage.usage,
+            network: n.specs.network,
+          })),
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    socket.on('disconnect', () => {
+      console.log(`❌ Client disconnected: ${socket.id}`);
+    });
+  });
+
+  console.log('🔌 WebSocket server ready');
+}

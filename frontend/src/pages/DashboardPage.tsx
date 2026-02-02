@@ -1,140 +1,144 @@
 import { useState, useEffect } from 'react';
 import { StatsGrid, ActivityFeed, QuickActions, NodeStatusList, MetricChart } from '../components/ui';
 import { motion } from 'framer-motion';
+import { useWebSocket } from '../hooks/useWebSocket';
+import { apiService } from '../services/api';
 
-// Mock data generator
-function generateMockData() {
-  return {
-    stats: {
-      totalNodes: 12,
-      activeConnections: 47,
-      cpuUsage: Math.floor(Math.random() * 30 + 40),
-      memoryUsage: Math.floor(Math.random() * 20 + 50),
-      totalStorage: '2.4 TB',
-      networkThroughput: '847 MB/s',
-    },
-    activities: [
-      {
-        id: '1',
-        type: 'node_join' as const,
-        message: 'Node alpha-server-03 joined the network',
-        timestamp: new Date(Date.now() - 2 * 60 * 1000),
-        status: 'healthy' as const,
-      },
-      {
-        id: '2',
-        type: 'deployment' as const,
-        message: 'Deployed web-api-v2.1.0 to 5 nodes',
-        timestamp: new Date(Date.now() - 15 * 60 * 1000),
-        status: 'healthy' as const,
-      },
-      {
-        id: '3',
-        type: 'optimization' as const,
-        message: 'Auto-scaled CPU allocation on gamma-mobile-02',
-        timestamp: new Date(Date.now() - 28 * 60 * 1000),
-        status: 'healthy' as const,
-      },
-      {
-        id: '4',
-        type: 'alert' as const,
-        message: 'High memory usage on beta-server-01 (85%)',
-        timestamp: new Date(Date.now() - 45 * 60 * 1000),
-        status: 'warning' as const,
-      },
-      {
-        id: '5',
-        type: 'node_leave' as const,
-        message: 'Node delta-pi-05 disconnected (maintenance)',
-        timestamp: new Date(Date.now() - 62 * 60 * 1000),
-        status: 'offline' as const,
-      },
-    ],
-    nodes: [
-      {
-        id: 'n1',
-        name: 'alpha-server-01',
-        status: 'healthy' as const,
-        type: 'alpha' as const,
-        cpu: 42,
-        memory: 68,
-        storage: 45,
-        uptime: '45d 12h',
-      },
-      {
-        id: 'n2',
-        name: 'alpha-server-02',
-        status: 'healthy' as const,
-        type: 'alpha' as const,
-        cpu: 38,
-        memory: 52,
-        storage: 62,
-        uptime: '30d 8h',
-      },
-      {
-        id: 'n3',
-        name: 'beta-server-01',
-        status: 'warning' as const,
-        type: 'beta' as const,
-        cpu: 72,
-        memory: 85,
-        storage: 78,
-        uptime: '12d 3h',
-      },
-      {
-        id: 'n4',
-        name: 'gamma-mobile-01',
-        status: 'healthy' as const,
-        type: 'gamma' as const,
-        cpu: 28,
-        memory: 45,
-        storage: 34,
-        uptime: '8d 15h',
-      },
-      {
-        id: 'n5',
-        name: 'gamma-mobile-02',
-        status: 'healthy' as const,
-        type: 'gamma' as const,
-        cpu: 35,
-        memory: 58,
-        storage: 42,
-        uptime: '5d 22h',
-      },
-      {
-        id: 'n6',
-        name: 'delta-pi-03',
-        status: 'healthy' as const,
-        type: 'delta' as const,
-        cpu: 18,
-        memory: 32,
-        storage: 55,
-        uptime: '89d 4h',
-      },
-    ],
-    cpuMetrics: Array.from({ length: 20 }, (_, i) => 
-      40 + Math.sin(i * 0.5) * 15 + Math.random() * 10
-    ),
-    memoryMetrics: Array.from({ length: 20 }, (_, i) => 
-      55 + Math.cos(i * 0.3) * 10 + Math.random() * 8
-    ),
-    networkMetrics: Array.from({ length: 20 }, (_, i) => 
-      700 + Math.sin(i * 0.7) * 100 + Math.random() * 50
-    ),
+interface NodeData {
+  id: string;
+  name: string;
+  type: 'alpha' | 'beta' | 'gamma' | 'delta';
+  status: 'healthy' | 'warning' | 'critical' | 'offline';
+  specs: {
+    cpu: { cores: number; usage: number; model: string };
+    memory: { total: number; used: number; usage: number };
+    storage: { total: number; used: number; usage: number };
+    network: { rx: number; tx: number };
   };
+  connections: string[];
+  uptime: number;
 }
 
 export function DashboardPage() {
-  const [data, setData] = useState(generateMockData());
+  const [nodes, setNodes] = useState<NodeData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [cpuHistory, setCpuHistory] = useState<number[]>([]);
+  const [memoryHistory, setMemoryHistory] = useState<number[]>([]);
+  const [networkHistory, setNetworkHistory] = useState<number[]>([]);
 
-  // Simulate real-time updates
+  const { isConnected, on, emit } = useWebSocket({
+    onConnect: () => {
+      console.log('✅ Connected to real-time updates');
+      emit('nodes:subscribe');
+    },
+  });
+
+  // Fetch initial data
   useEffect(() => {
-    const interval = setInterval(() => {
-      setData(generateMockData());
-    }, 5000); // Update every 5 seconds
+    const fetchData = async () => {
+      try {
+        const response = await apiService.getAllNodes();
+        setNodes(response.data.nodes);
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to fetch nodes:', err);
+        setError('Failed to connect to backend');
+        setLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
+    fetchData();
   }, []);
+
+  // Listen for real-time updates
+  useEffect(() => {
+    const handleNodesUpdate = (data: { nodes: NodeData[]; timestamp: string }) => {
+      console.log('📊 Received node updates:', data.timestamp);
+      setNodes(data.nodes);
+
+      // Update metrics history
+      const avgCpu = data.nodes.reduce((sum, n) => sum + n.specs.cpu.usage, 0) / data.nodes.length;
+      const avgMemory = data.nodes.reduce((sum, n) => sum + n.specs.memory.usage, 0) / data.nodes.length;
+      const totalNetwork = data.nodes.reduce((sum, n) => sum + n.specs.network.rx + n.specs.network.tx, 0);
+
+      setCpuHistory(prev => [...prev.slice(-19), avgCpu]);
+      setMemoryHistory(prev => [...prev.slice(-19), avgMemory]);
+      setNetworkHistory(prev => [...prev.slice(-19), totalNetwork]);
+    };
+
+    on('nodes:update', handleNodesUpdate);
+    on('nodes:initial', handleNodesUpdate);
+
+    return () => {
+      // Cleanup listeners
+    };
+  }, [on]);
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 border-4 border-neural-blue border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-neural-text">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 flex items-center justify-center h-full">
+        <div className="text-center max-w-md">
+          <p className="text-neural-red text-lg mb-2">⚠️ Connection Error</p>
+          <p className="text-neutral-text-secondary">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-neural-blue text-white rounded-md hover:bg-neural-blue/80"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = {
+    totalNodes: nodes.length,
+    activeConnections: nodes.reduce((sum, n) => sum + n.connections.length, 0),
+    cpuUsage: Math.round(nodes.reduce((sum, n) => sum + n.specs.cpu.usage, 0) / nodes.length),
+    memoryUsage: Math.round(nodes.reduce((sum, n) => sum + n.specs.memory.usage, 0) / nodes.length),
+    totalStorage: `${Math.round(nodes.reduce((sum, n) => sum + n.specs.storage.total, 0) / 1000000)}TB`,
+    networkThroughput: `${Math.round(nodes.reduce((sum, n) => sum + n.specs.network.rx + n.specs.network.tx, 0))}MB/s`,
+  };
+
+  const nodesList = nodes.map(n => ({
+    id: n.id,
+    name: n.name,
+    status: n.status,
+    type: n.type,
+    cpu: n.specs.cpu.usage,
+    memory: n.specs.memory.usage,
+    storage: n.specs.storage.usage,
+    uptime: formatUptime(n.uptime),
+  }));
+
+  const activities = [
+    {
+      id: '1',
+      type: 'node_join' as const,
+      message: `Real-time updates ${isConnected ? 'active' : 'inactive'}`,
+      timestamp: new Date(),
+      status: (isConnected ? 'healthy' : 'warning') as const,
+    },
+    {
+      id: '2',
+      type: 'deployment' as const,
+      message: `Connected to ${nodes.length} nodes`,
+      timestamp: new Date(Date.now() - 5000),
+      status: 'healthy' as const,
+    },
+  ];
 
   return (
     <div className="p-6 space-y-6">
@@ -143,46 +147,57 @@ export function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-3xl font-bold text-neural-text mb-2">Dashboard</h1>
-        <p className="text-neutral-text-secondary">
-          Monitor your neural mesh network in real-time
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-3xl font-bold text-neural-text">Dashboard</h1>
+            <p className="text-neutral-text-secondary">
+              Monitor your neural mesh network in real-time
+              {isConnected && <span className="ml-2 text-neural-green">● Live</span>}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Stats Grid */}
-      <StatsGrid data={data.stats} />
-
-      {/* Quick Actions */}
+      <StatsGrid data={stats} />
       <QuickActions />
 
-      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <MetricChart
-          title="CPU Usage (%)"
-          data={data.cpuMetrics}
-          color="#58a6ff"
-          height={120}
-        />
-        <MetricChart
-          title="Memory Usage (%)"
-          data={data.memoryMetrics}
-          color="#a371f7"
-          height={120}
-        />
-        <MetricChart
-          title="Network (MB/s)"
-          data={data.networkMetrics}
-          color="#3fb950"
-          height={120}
-        />
+        {cpuHistory.length > 0 && (
+          <MetricChart
+            title="CPU Usage (%)"
+            data={cpuHistory}
+            color="#58a6ff"
+            height={120}
+          />
+        )}
+        {memoryHistory.length > 0 && (
+          <MetricChart
+            title="Memory Usage (%)"
+            data={memoryHistory}
+            color="#a371f7"
+            height={120}
+          />
+        )}
+        {networkHistory.length > 0 && (
+          <MetricChart
+            title="Network (MB/s)"
+            data={networkHistory}
+            color="#3fb950"
+            height={120}
+          />
+        )}
       </div>
 
-      {/* Activity Feed and Node Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivityFeed activities={data.activities} />
-        <NodeStatusList nodes={data.nodes} />
+        <ActivityFeed activities={activities} />
+        <NodeStatusList nodes={nodesList} />
       </div>
     </div>
   );
 }
 
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  return `${days}d ${hours}h`;
+}
