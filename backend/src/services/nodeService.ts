@@ -26,6 +26,49 @@ class NodeService {
     return this.nodes.find((node) => node.id === id);
   }
 
+  addOrUpdateNode(nodeData: any) {
+    const existingIndex = this.nodes.findIndex(n => n.id === nodeData.id);
+    
+    if (existingIndex >= 0) {
+      // Update existing node
+      this.nodes[existingIndex] = {
+        ...this.nodes[existingIndex],
+        ...nodeData,
+        lastSeen: new Date().toISOString(),
+        status: this.calculateStatus(nodeData),
+      };
+    } else {
+      // Add new node
+      this.nodes.push({
+        ...nodeData,
+        createdAt: new Date().toISOString(),
+        lastSeen: new Date().toISOString(),
+        status: this.calculateStatus(nodeData),
+      });
+    }
+  }
+
+  markNodeOffline(nodeId: string) {
+    const node = this.nodes.find(n => n.id === nodeId);
+    if (node) {
+      node.status = 'offline';
+    }
+  }
+
+  calculateStatus(node: any): 'healthy' | 'warning' | 'critical' | 'offline' {
+    const { cpu, memory, storage } = node.specs;
+    
+    if (cpu.usage > 90 || memory.usage > 90 || storage.usage > 95) {
+      return 'critical';
+    }
+    
+    if (cpu.usage > 75 || memory.usage > 75 || storage.usage > 85) {
+      return 'warning';
+    }
+    
+    return 'healthy';
+  }
+
   updateNodeMetrics(nodeId: string): Node | undefined {
     const node = this.getNodeById(nodeId);
     if (!node) return undefined;

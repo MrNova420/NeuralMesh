@@ -12,7 +12,7 @@ use uuid::Uuid;
 #[command(about = "NeuralMesh Node Agent - Collects system metrics and reports to server")]
 struct Args {
     /// Server WebSocket URL
-    #[arg(short, long, default_value = "ws://localhost:3001")]
+    #[arg(short, long, default_value = "ws://localhost:3001/agent")]
     server: String,
 
     /// Node name (auto-generated if not provided)
@@ -33,6 +33,8 @@ struct NodeInfo {
     specs: Specs,
     location: Location,
     platform: Platform,
+    connections: Vec<String>,
+    uptime: u64,
 }
 
 #[derive(Debug, Serialize)]
@@ -66,8 +68,8 @@ struct StorageInfo {
 
 #[derive(Debug, Serialize)]
 struct NetworkInfo {
-    rx: u64,
-    tx: u64,
+    rx: f32,
+    tx: f32,
 }
 
 #[derive(Debug, Serialize)]
@@ -95,7 +97,7 @@ fn get_node_type(cpu_cores: usize, memory_gb: u64) -> &'static str {
     }
 }
 
-fn collect_metrics(sys: &mut System) -> Result<NodeInfo> {
+fn collect_metrics(sys: &mut System, node_id: &str, start_time: std::time::Instant) -> Result<NodeInfo> {
     sys.refresh_all();
 
     let cpu_cores = sys.cpus().len();
@@ -135,8 +137,10 @@ fn collect_metrics(sys: &mut System) -> Result<NodeInfo> {
     let node_type = get_node_type(cpu_cores, total_memory / 1024 / 1024 / 1024);
     let node_name = format!("{}-{}", node_type, &hostname[..hostname.len().min(8)]);
 
+    let uptime = start_time.elapsed().as_secs();
+
     Ok(NodeInfo {
-        id: Uuid::new_v4().to_string(),
+        id: node_id.to_string(),
         name: node_name,
         node_type: node_type.to_string(),
         specs: Specs {
@@ -155,7 +159,10 @@ fn collect_metrics(sys: &mut System) -> Result<NodeInfo> {
                 used: used_storage,
                 usage: storage_usage,
             },
-            network: NetworkInfo { rx, tx },
+            network: NetworkInfo {
+                rx: rx as f32 / 1024.0 / 1024.0, // Convert to MB
+                tx: tx as f32 / 1024.0 / 1024.0,
+            },
         },
         location: Location {
             region: "local".to_string(),
@@ -166,12 +173,16 @@ fn collect_metrics(sys: &mut System) -> Result<NodeInfo> {
             arch,
             hostname,
         },
+        connections: vec![],
+        uptime,
     })
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+    let node_id = format!("agent-{}", Uuid::new_v4());
+    let start_time = std::time::Instant::now();
 
     println!("🧠 NeuralMesh Node Agent v0.1.0");
     println!("📡 Connecting to {}", args.server);
@@ -185,8 +196,8 @@ async fn main() -> Result<()> {
 
     let (mut write, mut read) = ws_stream.split();
 
-    // Send initial node info
-    let node_info = collect_metrics(&mut sys)?;
+    // Send initial node registration
+    let node_info = collect_metrics(&mut sys, &node_id, start_time)?;
     println!("📊 Node: {} ({})", node_info.name, node_info.node_type);
     println!("   CPU: {} cores @ {:.1}%", node_info.specs.cpu.cores, node_info.specs.cpu.usage);
     println!("   Memory: {:.1} GB ({:.1}%)", 
@@ -199,12 +210,13 @@ async fn main() -> Result<()> {
         "data": node_info
     });
     write.send(Message::Text(register_msg.to_string())).await?;
+    println!("📝 Registered with server");
 
     // Main loop: send metrics periodically
     loop {
         tokio::select! {
             _ = update_interval.tick() => {
-                let metrics = collect_metrics(&mut sys)?;
+                let metrics = collect_metrics(&mut sys, &node_id, start_time)?;
                 let msg = serde_json::json!({
                     "event": "node:metrics",
                     "data": metrics
@@ -215,24 +227,27 @@ async fn main() -> Result<()> {
                     break;
                 }
                 
-                print!("📤 Sent metrics (CPU: {:.1}%, MEM: {:.1}%) ", 
+                print!("📤 CPU: {:.1}%, MEM: {:.1}%, DISK: {:.1}%\r", 
                     metrics.specs.cpu.usage, 
-                    metrics.specs.memory.usage
+                    metrics.specs.memory.usage,
+                    metrics.specs.storage.usage
                 );
-                println!("");
+                std::io::Write::flush(&mut std::io::stdout()).ok();
             }
             
             msg = read.next() => {
                 match msg {
                     Some(Ok(Message::Text(text))) => {
-                        println!("📥 Received: {}", text);
+                        if text.contains("register:success") {
+                            println!("\n✅ Registration confirmed");
+                        }
                     }
                     Some(Ok(Message::Close(_))) => {
-                        println!("🔌 Server closed connection");
+                        println!("\n🔌 Server closed connection");
                         break;
                     }
                     Some(Err(e)) => {
-                        eprintln!("❌ WebSocket error: {}", e);
+                        eprintln!("\n❌ WebSocket error: {}", e);
                         break;
                     }
                     None => break,
@@ -242,6 +257,6 @@ async fn main() -> Result<()> {
         }
     }
 
-    println!("👋 Agent shutting down");
+    println!("\n👋 Agent shutting down");
     Ok(())
 }
