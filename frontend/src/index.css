@@ -1,44 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  * {
-    @apply border-neural-border;
-  }
+@theme {
+  --color-neural-bg: #0d1117;
+  --color-neural-panel: #161b22;
+  --color-neural-border: #30363d;
+  --color-neural-hover: #21262d;
+  --color-neural-text: #c9d1d9;
+  --color-neural-text-secondary: #8b949e;
+  --color-neural-blue: #58a6ff;
+  --color-neural-green: #3fb950;
+  --color-neural-yellow: #d29922;
+  --color-neural-red: #f85149;
+  --color-neural-purple: #a371f7;
+  --color-neural-cyan: #39c5cf;
+  --color-neural-orange: #ff7b42;
   
-  body {
-    @apply bg-neural-bg text-neural-text antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-  
-  #root {
-    @apply min-h-screen;
-  }
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
 }
 
-@layer components {
-  .neural-card {
-    @apply bg-neural-panel border border-neural-border rounded-lg p-4 
-           hover:border-neural-blue/50 transition-colors;
-  }
-  
-  .neural-button {
-    @apply px-4 py-2 bg-neural-blue text-white rounded-md
-           hover:bg-neural-blue/80 transition-colors font-medium;
-  }
-  
-  .neural-input {
-    @apply w-full px-3 py-2 bg-neural-panel border border-neural-border rounded-md
-           text-neural-text placeholder:text-neural-text-secondary
-           focus:outline-none focus:border-neural-blue focus:ring-1 focus:ring-neural-blue;
-  }
-  
-  .neural-glow {
-    @apply shadow-neural animate-glow;
-  }
-  
-  .neural-pulse {
-    @apply animate-pulse-slow;
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+body {
+  background-color: var(--color-neural-bg);
+  color: var(--color-neural-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.neural-card {
+  background-color: var(--color-neural-panel);
+  border: 1px solid var(--color-neural-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: border-color 0.2s;
+}
+
+.neural-card:hover {
+  border-color: rgba(88, 166, 255, 0.5);
 }
