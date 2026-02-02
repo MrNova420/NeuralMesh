@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-neural-border;
+  }
+  
+  body {
+    @apply bg-neural-bg text-neural-text antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer components {
+  .neural-card {
+    @apply bg-neural-panel border border-neural-border rounded-lg p-4 
+           hover:border-neural-blue/50 transition-colors;
+  }
+  
+  .neural-button {
+    @apply px-4 py-2 bg-neural-blue text-white rounded-md
+           hover:bg-neural-blue/80 transition-colors font-medium;
+  }
+  
+  .neural-input {
+    @apply w-full px-3 py-2 bg-neural-panel border border-neural-border rounded-md
+           text-neural-text placeholder:text-neural-text-secondary
+           focus:outline-none focus:border-neural-blue focus:ring-1 focus:ring-neural-blue;
+  }
+  
+  .neural-glow {
+    @apply shadow-neural animate-glow;
+  }
+  
+  .neural-pulse {
+    @apply animate-pulse-slow;
+  }
+}
