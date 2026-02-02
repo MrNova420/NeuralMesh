@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Backend API + WebSocket server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: neuralmesh-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - neuralmesh
+
+  # Frontend Nginx server
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: neuralmesh-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - neuralmesh
+
+  # Example agent (can be scaled)
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: neuralmesh-agent-1
+    environment:
+      - SERVER_URL=ws://backend:3001
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - neuralmesh
+
+networks:
+  neuralmesh:
+    driver: bridge
+
+volumes:
+  neuralmesh-data:

@@ -1,0 +1,27 @@
+# Use Rust base image for building
+FROM rust:1.93-alpine AS builder
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache musl-dev
+
+# Copy source
+COPY agent/Cargo.toml agent/Cargo.lock ./
+COPY agent/src ./src
+
+# Build release binary
+RUN cargo build --release
+
+# Runtime stage
+FROM alpine:latest
+RUN apk add --no-cache libgcc
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/target/release/neuralmesh-agent ./neuralmesh-agent
+
+# Default to connecting to backend service
+ENV SERVER_URL=ws://backend:3001
+
+ENTRYPOINT ["./neuralmesh-agent"]
+CMD ["--server", "${SERVER_URL}"]
