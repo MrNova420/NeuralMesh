@@ -9,3 +9,8 @@ export { default as DeviceTransformationPage } from './DeviceTransformationPage'
 export { default as MeshControlPage } from './MeshControlPage';
 export { default as TemplateGalleryPage } from './TemplateGalleryPage';
 export { default as OptimizationPage } from './OptimizationPage';
+export { default as GameServerControlPage } from './GameServerControlPage';
+export { default as StorageDashboardPage } from './StorageDashboardPage';
+export { default as AdvancedMonitoringPage } from './AdvancedMonitoringPage';
+export { default as UserProfilePage } from './UserProfilePage';
+export { default as NotificationCenter } from './NotificationCenter';
