@@ -11,6 +11,7 @@ interface BounceCardsProps {
   easeType?: string;
   transformStyles?: string[];
   enableHover?: boolean;
+  cards?: any[];
 }
 
 export default function BounceCards({

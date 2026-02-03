@@ -21,10 +21,10 @@ interface Player {
 const GameServerControlPage: React.FC = () => {
   const [servers, setServers] = useState<GameServer[]>([]);
   const [selectedServer, setSelectedServer] = useState<string | null>(null);
-  const [console, setConsole] = useState<string>('');
+  const [consoleOutput, setConsoleOutput] = useState<string>('');
   const [command, setCommand] = useState('');
   const [players, setPlayers] = useState<Player[]>([]);
-  const [files, setFiles] = useState<any[]>([]);
+  const [, setFiles] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('console');
   const [loading, setLoading] = useState(false);
@@ -50,8 +50,9 @@ const GameServerControlPage: React.FC = () => {
       if (gameServers.length > 0 && !selectedServer) {
         setSelectedServer(gameServers[0].id);
       }
-    } catch (error) {
-      console.error('Failed to load servers:', error);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load servers:', err);
     }
   };
 
@@ -63,7 +64,7 @@ const GameServerControlPage: React.FC = () => {
       switch (activeTab) {
         case 'console':
           const consoleData = await api.get(`/gameservers/${selectedServer}/console`);
-          setConsole(consoleData.data.output || '');
+          setConsoleOutput(consoleData.data.output || '');
           break;
         case 'players':
           const playersData = await api.get(`/gameservers/${selectedServer}/players`);
@@ -78,8 +79,9 @@ const GameServerControlPage: React.FC = () => {
           setMods(modsData.data || []);
           break;
       }
-    } catch (error) {
-      console.error(`Failed to load ${activeTab}:`, error);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to load ${activeTab}:`, err);
     } finally {
       setLoading(false);
     }
@@ -93,8 +95,9 @@ const GameServerControlPage: React.FC = () => {
       setCommand('');
       // Reload console
       setTimeout(loadServerData, 500);
-    } catch (error) {
-      console.error('Failed to send command:', error);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to send command:', err);
     }
   };
 
@@ -106,8 +109,9 @@ const GameServerControlPage: React.FC = () => {
         reason: 'Kicked by admin'
       });
       loadServerData();
-    } catch (error) {
-      console.error('Failed to kick player:', error);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to kick player:', err);
     }
   };
 
@@ -192,7 +196,7 @@ const GameServerControlPage: React.FC = () => {
                     {activeTab === 'console' && (
                       <div>
                         <div className="bg-black text-green-400 p-4 rounded-lg font-mono text-sm mb-4 h-96 overflow-y-auto">
-                          <pre>{console || 'Console output will appear here...'}</pre>
+                          <pre>{consoleOutput || 'Console output will appear here...'}</pre>
                         </div>
                         <div className="flex space-x-2">
                           <input

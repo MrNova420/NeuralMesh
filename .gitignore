@@ -12,6 +12,7 @@ coverage/
 backend/.env
 frontend/.env
 DATABASE_ACCESS.txt
+.db-credentials
 
 # Rust build artifacts
 agent/target/

@@ -113,6 +113,7 @@ interface AuroraProps {
   blend?: number;
   time?: number;
   speed?: number;
+  className?: string;
 }
 
 export default function Aurora(props: AuroraProps) {

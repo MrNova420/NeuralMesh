@@ -4,6 +4,36 @@
 
 Turn any device into a high-performance server node. No subscription fees, no hosting charges, no hidden costs. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
+---
+
+## 🚨 PROJECT BROKEN? START HERE! 
+
+**If nothing works after cloning**, choose based on your needs:
+
+### ⚡ Option A: Quick Test (No Database - 2 minutes)
+```bash
+chmod +x quick-fix.sh && ./quick-fix.sh
+./start.sh
+```
+**Works on:** WSL, Termux, Linux, macOS - NO sudo needed
+
+### 🗄️ Option B: Full Setup with Database (10 minutes) 
+```bash
+chmod +x setup-database.sh && ./setup-database.sh
+./start.sh
+```
+**Works on:** WSL, Termux, Linux, macOS - Auto-handles platform differences
+
+### 🔍 Option C: Test Your System First
+```bash
+chmod +x test-compatibility.sh && ./test-compatibility.sh
+```
+**Verifies:** All tools, scripts, and dependencies
+
+**📖 See all methods:** [INSTALL_METHODS.md](./INSTALL_METHODS.md)
+
+---
+
 ## 🎉 Completely FREE Forever
 
 - ✅ **$0/month** - No subscription fees
@@ -102,9 +132,45 @@ Automatic categorization based on hardware:
 
 ## 📦 Quick Start
 
-### ⚡ One-Click Installation (Recommended)
+### 🚀 FASTEST: Quick Fix (2 minutes - No Database)
 
-**Linux/macOS:**
+**For testing without database:**
+
+```bash
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+chmod +x quick-fix.sh && ./quick-fix.sh
+./start.sh
+```
+
+**Access:** http://localhost:5173  
+**Time:** ~2 minutes
+
+### 🗄️ RECOMMENDED: Full Database Setup (10 minutes)
+
+**For complete functionality with PostgreSQL:**
+
+```bash
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+chmod +x setup-database.sh && ./setup-database.sh
+./start.sh
+```
+
+**Includes:**
+- ✅ PostgreSQL database setup
+- ✅ User authentication
+- ✅ Device management  
+- ✅ Historical metrics
+- ✅ All features enabled
+
+**Time:** ~10 minutes
+
+### ⚡ One-Click Full Installation (10 minutes)
+
+**For production with PostgreSQL + Redis:**
+
+**Linux/macOS/WSL:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/MrNova420/NeuralMesh/main/install.sh | bash
 ```
@@ -116,7 +182,7 @@ Set-ExecutionPolicy Bypass -Scope Process
 .\install.ps1
 ```
 
-**Time:** ~5-10 minutes for complete setup
+**Time:** ~10 minutes for complete setup
 
 ### 🐳 Docker Compose (Alternative)
 
@@ -130,6 +196,16 @@ docker-compose -f docker-compose.prod.yml up -d
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **API Docs**: http://localhost:3000/docs
+
+### 📚 More Installation Methods
+
+See **[INSTALL_METHODS.md](./INSTALL_METHODS.md)** for:
+- Quick fix vs Full setup comparison
+- WSL Ubuntu specific instructions
+- Termux (Android) specific instructions  
+- Development setup
+- Manual installation
+- Troubleshooting
 
 ### 📱 Add Your First Device
 

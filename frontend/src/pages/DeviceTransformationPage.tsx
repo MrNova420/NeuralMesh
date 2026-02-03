@@ -26,13 +26,13 @@ export default function DeviceTransformationPage() {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (transformation && transformation.status !== 'completed' && transformation.status !== 'failed') {
       interval = setInterval(() => {
         checkTransformationStatus();
       }, 2000);
     }
-    return () => clearInterval(interval);
+    return () => { if (interval) clearInterval(interval); };
   }, [transformation]);
 
   const fetchProfiles = async () => {

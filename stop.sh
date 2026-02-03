@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # NeuralMesh Stop Script
+# Universal: Works on WSL, Termux, Linux, macOS
 # Stops all NeuralMesh services gracefully
 
 # Colors
@@ -16,27 +17,44 @@ echo -e "${BLUE}   Stopping NeuralMesh Services${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo
 
-# Function to stop processes on a port
+# Function to get PIDs for a port (universal)
+get_port_pids() {
+    local port=$1
+    if command -v lsof &> /dev/null; then
+        lsof -Pi :$port -sTCP:LISTEN -t 2>/dev/null
+    elif command -v netstat &> /dev/null; then
+        netstat -tulpn 2>/dev/null | grep ":$port " | awk '{print $7}' | cut -d'/' -f1
+    elif command -v ss &> /dev/null; then
+        ss -tulpn 2>/dev/null | grep ":$port " | grep -o 'pid=[0-9][0-9]*' | sed 's/.*=//'
+    else
+        # Fallback: search process list for node/npm on this port
+        ps aux | grep -E "node|npm" | grep -v grep | awk '{print $2}'
+    fi
+}
+
+# Function to stop processes on a port (universal)
 stop_port() {
     local port=$1
     local name=$2
     
-    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+    local pids=$(get_port_pids $port)
+    
+    if [ -n "$pids" ]; then
         echo -e "${YELLOW}Stopping $name (port $port)...${NC}"
-        local pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
         for pid in $pids; do
-            kill -15 $pid 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid" || echo -e "${YELLOW}⚠${NC} Process $pid already stopped"
+            if kill -0 $pid 2>/dev/null; then
+                kill -15 $pid 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid" || echo -e "${YELLOW}⚠${NC} Process $pid already stopped"
+            fi
         done
         sleep 1
         
         # Force kill if still running
-        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
-            echo -e "${YELLOW}Force stopping remaining processes...${NC}"
-            pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
-            for pid in $pids; do
+        for pid in $pids; do
+            if kill -0 $pid 2>/dev/null; then
+                echo -e "${YELLOW}Force stopping process $pid...${NC}"
                 kill -9 $pid 2>/dev/null
-            done
-        fi
+            fi
+        done
     else
         echo -e "${BLUE}$name (port $port):${NC} ${GREEN}Not running${NC}"
     fi
@@ -54,7 +72,17 @@ stop_port 5173 "Frontend"
 # Stop frontend on port 5174 (fallback port)
 stop_port 5174 "Frontend (alternate)"
 
-# Check if systemd service is running (Linux)
+# Additional cleanup: stop any remaining node/npm processes from NeuralMesh
+echo
+echo -e "${BLUE}Cleaning up any remaining NeuralMesh processes...${NC}"
+NEURALMESH_PIDS=$(ps -eo pid,command 2>/dev/null | awk '(/[n]ode/ || /[n]pm/) && /neuralmesh/ {print $1}')
+if [ -n "$NEURALMESH_PIDS" ]; then
+    for pid in $NEURALMESH_PIDS; do
+        kill -15 "$pid" 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid"
+    done
+fi
+
+# Check if systemd service is running (Linux only)
 if command -v systemctl &> /dev/null; then
     if systemctl is-active --quiet neuralmesh 2>/dev/null; then
         echo
@@ -72,6 +100,6 @@ echo -e "${BLUE}📝 Log files preserved:${NC}"
 echo -e "   Backend:  /tmp/neuralmesh-backend.log"
 echo -e "   Frontend: /tmp/neuralmesh-frontend.log"
 echo
-echo -e "${BLUE}🔄 To restart:${NC} ${YELLOW}./start.sh${NC} or ${YELLOW}./quick-start.sh${NC}"
+echo -e "${BLUE}🔄 To restart:${NC} ${YELLOW}./start.sh${NC}"
 echo
 

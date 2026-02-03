@@ -2,7 +2,7 @@ import { useInView, useMotionValue, useSpring } from 'motion/react';
 import { useCallback, useEffect, useRef } from 'react';
 
 interface CountUpProps {
-  to: number;
+  to?: number;
   from?: number;
   direction?: 'up' | 'down';
   delay?: number;
@@ -12,10 +12,12 @@ interface CountUpProps {
   separator?: string;
   onStart?: () => void;
   onEnd?: () => void;
+  value?: number;
+  suffix?: string;
 }
 
 export default function CountUp({
-  to,
+  to = 0,
   from = 0,
   direction = 'up',
   delay = 0,
@@ -24,10 +26,13 @@ export default function CountUp({
   startWhen = true,
   separator = '',
   onStart,
-  onEnd
+  onEnd,
+  value,
+  suffix = ''
 }: CountUpProps) {
+  const finalTo = value !== undefined ? value : to;
   const ref = useRef<HTMLSpanElement>(null);
-  const motionValue = useMotionValue(direction === 'down' ? to : from);
+  const motionValue = useMotionValue(direction === 'down' ? finalTo : from);
 
   const damping = 20 + 40 * (1 / duration);
   const stiffness = 100 * (1 / duration);
@@ -50,7 +55,7 @@ export default function CountUp({
     return 0;
   };
 
-  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
+  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(finalTo));
 
   const formatValue = useCallback(
     (latest: number) => {
@@ -63,17 +68,18 @@ export default function CountUp({
       };
 
       const formattedNumber = Intl.NumberFormat('en-US', options).format(latest);
+      const result = separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
 
-      return separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
+      return suffix ? result + suffix : result;
     },
-    [maxDecimals, separator]
+    [maxDecimals, separator, suffix]
   );
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.textContent = formatValue(direction === 'down' ? to : from);
+      ref.current.textContent = formatValue(direction === 'down' ? finalTo : from);
     }
-  }, [from, to, direction, formatValue]);
+  }, [from, finalTo, direction, formatValue]);
 
   useEffect(() => {
     if (isInView && startWhen) {
@@ -82,7 +88,7 @@ export default function CountUp({
       }
 
       const timeoutId = setTimeout(() => {
-        motionValue.set(direction === 'down' ? from : to);
+        motionValue.set(direction === 'down' ? from : finalTo);
       }, delay * 1000);
 
       const durationTimeoutId = setTimeout(
@@ -99,7 +105,7 @@ export default function CountUp({
         clearTimeout(durationTimeoutId);
       };
     }
-  }, [isInView, startWhen, motionValue, direction, from, to, delay, onStart, onEnd, duration]);
+  }, [isInView, startWhen, motionValue, direction, from, finalTo, delay, onStart, onEnd, duration]);
 
   useEffect(() => {
     const unsubscribe = springValue.on('change', (latest: number) => {
