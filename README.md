@@ -10,17 +10,25 @@ Turn any device into a high-performance server node. No subscription fees, no ho
 
 **If nothing works after cloning**, choose based on your needs:
 
-### Option A: Quick Test (No Database - 2 minutes)
+### ⚡ Option A: Quick Test (No Database - 2 minutes)
 ```bash
 chmod +x quick-fix.sh && ./quick-fix.sh
 ./start.sh
 ```
+**Works on:** WSL, Termux, Linux, macOS - NO sudo needed
 
-### Option B: Full Setup with Database (10 minutes) 
+### 🗄️ Option B: Full Setup with Database (10 minutes) 
 ```bash
 chmod +x setup-database.sh && ./setup-database.sh
 ./start.sh
 ```
+**Works on:** WSL, Termux, Linux, macOS - Auto-handles platform differences
+
+### 🔍 Option C: Test Your System First
+```bash
+chmod +x test-compatibility.sh && ./test-compatibility.sh
+```
+**Verifies:** All tools, scripts, and dependencies
 
 **📖 See all methods:** [INSTALL_METHODS.md](./INSTALL_METHODS.md)
 
