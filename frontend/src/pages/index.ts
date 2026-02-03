@@ -7,3 +7,5 @@ export { default as RegisterPage } from './RegisterPage';
 export { default as ServersPage } from './ServersPage';
 export { default as DeviceTransformationPage } from './DeviceTransformationPage';
 export { default as MeshControlPage } from './MeshControlPage';
+export { default as TemplateGalleryPage } from './TemplateGalleryPage';
+export { default as OptimizationPage } from './OptimizationPage';
