@@ -2,25 +2,148 @@
 
 ## Overview
 
-NeuralMesh provides a RESTful API and WebSocket interface for managing and monitoring distributed server nodes.
+NeuralMesh provides a comprehensive RESTful API and WebSocket interface for managing and monitoring distributed server nodes with intelligent analytics.
 
 **Base URL**: `http://localhost:3001/api`  
 **WebSocket**: `ws://localhost:3001`
 
+**Version**: 0.2.0
+
+## What's New in v0.2.0
+
+- 🔐 JWT Authentication & User Management
+- 💾 PostgreSQL Database Integration
+- ⚡ Redis Caching Layer
+- 🧠 Smart Monitoring & Health Scoring
+- 📊 Predictive Analytics & Anomaly Detection
+- 🎯 Node Actions (Restart/Shutdown/Disconnect)
+- 🛡️ Rate Limiting & Input Validation
+- 📈 Historical Metrics Storage
+
 ## Authentication
 
-Currently in development. Future versions will support JWT-based authentication.
+Most endpoints support optional authentication. Protected endpoints require a JWT access token in the Authorization header.
+
+```http
+Authorization: Bearer <access_token>
+```
+
+### Token Lifecycle
+- **Access Token**: 15 minutes validity
+- **Refresh Token**: 7 days validity
+- Tokens are obtained via `/api/auth/login`
+- Refresh tokens via `/api/auth/refresh`
 
 ---
 
-## REST API Endpoints
+## Authentication Endpoints
 
-### Nodes
+### Register User
+```http
+POST /api/auth/register
+```
 
-#### Get All Nodes
+**Request Body**:
+```json
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+**Response**: `201 Created`
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": "uuid",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "role": "user"
+  }
+}
+```
+
+**Rate Limit**: 10 requests per 15 minutes
+
+### Login
+```http
+POST /api/auth/login
+```
+
+**Request Body**:
+```json
+{
+  "username": "johndoe",
+  "password": "SecurePass123!"
+}
+```
+
+**Response**: `200 OK`
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "role": "user"
+  }
+}
+```
+
+**Rate Limit**: 10 requests per 15 minutes
+
+### Refresh Token
+```http
+POST /api/auth/refresh
+```
+
+**Request Body**:
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response**: `200 OK`
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Logout
+```http
+POST /api/auth/logout
+```
+
+**Request Body**:
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response**: `200 OK`
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+## Node Endpoints
+
+### Get All Nodes
 ```http
 GET /api/nodes
 ```
+
+**Features**: Cached (5s), Rate Limited
 
 **Response**: `200 OK`
 ```json

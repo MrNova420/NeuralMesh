@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: neuralmesh-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neuralmesh
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - neuralmesh
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: neuralmesh-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - neuralmesh
+
   # Backend API + WebSocket server
   backend:
     build:
@@ -9,9 +40,21 @@ services:
     container_name: neuralmesh-backend
     ports:
       - "3001:3001"
+      - "4001:4001"
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - AGENT_PORT=4001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/neuralmesh
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
+      - REFRESH_SECRET=${REFRESH_SECRET:-change-this-in-production}
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
     networks:
       - neuralmesh
@@ -37,7 +80,9 @@ services:
       dockerfile: Dockerfile.agent
     container_name: neuralmesh-agent-1
     environment:
-      - SERVER_URL=ws://backend:3001
+      - SERVER_URL=ws://backend:4001/agent
+      - UPDATE_INTERVAL=2
+      - NODE_NAME=docker-agent
     depends_on:
       - backend
     restart: unless-stopped
@@ -50,3 +95,5 @@ networks:
 
 volumes:
   neuralmesh-data:
+  postgres_data:
+  redis_data:
