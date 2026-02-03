@@ -8,6 +8,7 @@ import metricsRouter from './src/routes/metrics';
 import statusRouter from './src/routes/status';
 import authRouter from './src/routes/auth';
 import actionsRouter from './src/routes/actions';
+import analyticsRouter from './src/routes/analytics';
 import { setupWebSocket } from './src/websocket/server';
 import { setupAgentWebSocket } from './src/websocket/agentServer';
 import { errorHandler } from './src/middleware/error';
@@ -38,6 +39,9 @@ app.get('/', (c) => {
       database: true,
       rateLimit: true,
       nodeActions: true,
+      smartMonitoring: true,
+      analytics: true,
+      caching: true,
     },
   });
 });
@@ -48,6 +52,7 @@ app.route('/api/nodes', nodesRouter);
 app.route('/api/metrics', metricsRouter);
 app.route('/api/status', statusRouter);
 app.route('/api/actions', actionsRouter);
+app.route('/api/analytics', analyticsRouter);
 
 // 404 handler
 app.notFound((c) => {
