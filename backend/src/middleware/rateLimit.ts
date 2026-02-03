@@ -3,6 +3,16 @@ import type { Context, Next } from 'hono';
 // Simple in-memory rate limiter
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
+// Periodic cleanup every 60 seconds instead of per-request
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of requestCounts.entries()) {
+    if (now > value.resetTime) {
+      requestCounts.delete(key);
+    }
+  }
+}, 60000);
+
 interface RateLimitOptions {
   windowMs: number; // Time window in milliseconds
   maxRequests: number; // Max requests per window
@@ -14,13 +24,6 @@ export function rateLimiter(options: RateLimitOptions) {
   return async (c: Context, next: Next) => {
     const ip = c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown';
     const now = Date.now();
-
-    // Clean up expired entries
-    for (const [key, value] of requestCounts.entries()) {
-      if (now > value.resetTime) {
-        requestCounts.delete(key);
-      }
-    }
 
     const record = requestCounts.get(ip);
 

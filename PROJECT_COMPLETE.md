@@ -267,7 +267,7 @@ docker-compose -f docker-compose.prod.yml up
 - ✅ Production deployment ready
 - ✅ 100% FREE forever
 
-**All development complete. All tasks done. Ready for the world!** ��💚
+**All development complete. All tasks done. Ready for the world!** 💚
 
 ---
 

@@ -167,8 +167,7 @@ class BackupAutomationService {
     // Simulate backup operation
     return new Promise((resolve) => {
       setTimeout(() => {
-        console.log(`Backup: ${source} -> ${destination}`);
-        console.log(`Compression: ${compression}, Encryption: ${encryption}`);
+        logger.info({ source, destination, compression, encryption }, 'Backup completed');
         resolve();
       }, 2000); // Simulate 2 second backup
     });

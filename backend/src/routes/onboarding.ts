@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Hono } from 'hono';
 import { z } from 'zod';
 import { deviceOnboardingService } from '../services/deviceOnboardingService';
-import { authenticateToken } from '../middleware/auth';
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth';
 import { logger } from '../utils/logger';
 
-const router = Router();
+const router = new Hono();
 
 // Validation schemas
 const registerDeviceSchema = z.object({
@@ -32,16 +32,17 @@ const joinMeshSchema = z.object({
  * Generate pairing code
  * POST /api/onboarding/pairing-code
  */
-router.post('/pairing-code', authenticateToken, async (req: Request, res: Response) => {
+router.post('/pairing-code', authMiddleware, async (c) => {
   try {
     const { code, expiresAt } = deviceOnboardingService.generatePairingCode();
     
+    const auth = c.get('auth');
     logger.info('Pairing code generated', { 
-      userId: (req as any).user?.id,
+      userId: auth?.userId,
       expiresAt 
     });
 
-    res.json({
+    return c.json({
       success: true,
       code,
       expiresAt,
@@ -49,10 +50,10 @@ router.post('/pairing-code', authenticateToken, async (req: Request, res: Respon
     });
   } catch (error) {
     logger.error('Error generating pairing code:', error);
-    res.status(500).json({
+    return c.json({
       success: false,
       error: 'Failed to generate pairing code'
-    });
+    }, 500);
   }
 });
 
@@ -60,24 +61,26 @@ router.post('/pairing-code', authenticateToken, async (req: Request, res: Respon
  * Register a new device
  * POST /api/onboarding/register
  */
-router.post('/register', authenticateToken, async (req: Request, res: Response) => {
+router.post('/register', authMiddleware, async (c) => {
   try {
-    const validation = registerDeviceSchema.safeParse(req.body);
+    const body = await c.req.json();
+    const validation = registerDeviceSchema.safeParse(body);
     
     if (!validation.success) {
-      return res.status(400).json({
+      return c.json({
         success: false,
         error: 'Invalid request data',
         details: validation.error.issues
-      });
+      }, 400);
     }
 
-    const userId = (req as any).user?.id;
+    const auth = c.get('auth');
+    const userId = auth?.userId;
     if (!userId) {
-      return res.status(401).json({
+      return c.json({
         success: false,
         error: 'User not authenticated'
-      });
+      }, 401);
     }
 
     const result = await deviceOnboardingService.registerDevice(
@@ -91,16 +94,16 @@ router.post('/register', authenticateToken, async (req: Request, res: Response) 
       deviceName: validation.data.name
     });
 
-    res.json({
+    return c.json({
       success: true,
       ...result
     });
   } catch (error: any) {
     logger.error('Error registering device:', error);
-    res.status(400).json({
+    return c.json({
       success: false,
       error: error.message || 'Failed to register device'
-    });
+    }, 400);
   }
 });
 
@@ -108,31 +111,32 @@ router.post('/register', authenticateToken, async (req: Request, res: Response) 
  * Verify device with API key
  * POST /api/onboarding/verify
  */
-router.post('/verify', async (req: Request, res: Response) => {
+router.post('/verify', async (c) => {
   try {
-    const validation = verifyDeviceSchema.safeParse(req.body);
+    const body = await c.req.json();
+    const validation = verifyDeviceSchema.safeParse(body);
     
     if (!validation.success) {
-      return res.status(400).json({
+      return c.json({
         success: false,
         error: 'Invalid API key format'
-      });
+      }, 400);
     }
 
     const result = await deviceOnboardingService.verifyDevice(validation.data.apiKey);
 
     logger.info('Device verified', { nodeId: result.nodeId });
 
-    res.json({
+    return c.json({
       success: true,
       ...result
     });
   } catch (error: any) {
     logger.error('Error verifying device:', error);
-    res.status(401).json({
+    return c.json({
       success: false,
       error: error.message || 'Device verification failed'
-    });
+    }, 401);
   }
 });
 
@@ -140,16 +144,17 @@ router.post('/verify', async (req: Request, res: Response) => {
  * Join device to mesh network
  * POST /api/onboarding/join-mesh
  */
-router.post('/join-mesh', async (req: Request, res: Response) => {
+router.post('/join-mesh', async (c) => {
   try {
-    const validation = joinMeshSchema.safeParse(req.body);
+    const body = await c.req.json();
+    const validation = joinMeshSchema.safeParse(body);
     
     if (!validation.success) {
-      return res.status(400).json({
+      return c.json({
         success: false,
         error: 'Invalid request data',
         details: validation.error.issues
-      });
+      }, 400);
     }
 
     const result = await deviceOnboardingService.joinMesh(
@@ -162,16 +167,16 @@ router.post('/join-mesh', async (req: Request, res: Response) => {
       role: result.role
     });
 
-    res.json({
+    return c.json({
       success: true,
       ...result
     });
   } catch (error: any) {
     logger.error('Error joining mesh:', error);
-    res.status(400).json({
+    return c.json({
       success: false,
       error: error.message || 'Failed to join mesh'
-    });
+    }, 400);
   }
 });
 
@@ -179,21 +184,21 @@ router.post('/join-mesh', async (req: Request, res: Response) => {
  * Discover devices on network
  * GET /api/onboarding/discover
  */
-router.get('/discover', authenticateToken, async (req: Request, res: Response) => {
+router.get('/discover', authMiddleware, async (c) => {
   try {
     const devices = await deviceOnboardingService.discoverDevices();
 
-    res.json({
+    return c.json({
       success: true,
       devices,
       count: devices.length
     });
   } catch (error) {
     logger.error('Error discovering devices:', error);
-    res.status(500).json({
+    return c.json({
       success: false,
       error: 'Failed to discover devices'
-    });
+    }, 500);
   }
 });
 
@@ -201,31 +206,31 @@ router.get('/discover', authenticateToken, async (req: Request, res: Response) =
  * Generate QR code data for pairing
  * GET /api/onboarding/qr-code/:code
  */
-router.get('/qr-code/:code', async (req: Request, res: Response) => {
+router.get('/qr-code/:code', async (c) => {
   try {
-    const { code } = req.params;
+    const code = c.req.param('code');
     
     const isValid = await deviceOnboardingService.verifyPairingCode(code);
     
     if (!isValid) {
-      return res.status(400).json({
+      return c.json({
         success: false,
         error: 'Invalid or expired pairing code'
-      });
+      }, 400);
     }
 
     const qrData = deviceOnboardingService.generateQRCodeData(code);
 
-    res.json({
+    return c.json({
       success: true,
       qrData
     });
   } catch (error) {
     logger.error('Error generating QR code:', error);
-    res.status(500).json({
+    return c.json({
       success: false,
       error: 'Failed to generate QR code'
-    });
+    }, 500);
   }
 });
 
@@ -233,22 +238,22 @@ router.get('/qr-code/:code', async (req: Request, res: Response) => {
  * Get installation guide
  * GET /api/onboarding/installation-guide
  */
-router.get('/installation-guide', async (req: Request, res: Response) => {
+router.get('/installation-guide', async (c) => {
   try {
-    const { os } = req.query;
+    const os = c.req.query('os');
     
-    const guide = deviceOnboardingService.getInstallationGuide(os as string);
+    const guide = deviceOnboardingService.getInstallationGuide(os);
 
-    res.json({
+    return c.json({
       success: true,
       guide
     });
   } catch (error) {
     logger.error('Error getting installation guide:', error);
-    res.status(500).json({
+    return c.json({
       success: false,
       error: 'Failed to get installation guide'
-    });
+    }, 500);
   }
 });
 
@@ -256,27 +261,28 @@ router.get('/installation-guide', async (req: Request, res: Response) => {
  * Revoke device access
  * POST /api/onboarding/revoke/:deviceId
  */
-router.post('/revoke/:deviceId', authenticateToken, async (req: Request, res: Response) => {
+router.post('/revoke/:deviceId', authMiddleware, async (c) => {
   try {
-    const { deviceId } = req.params;
+    const deviceId = c.req.param('deviceId');
     
     await deviceOnboardingService.revokeDevice(deviceId);
 
+    const auth = c.get('auth');
     logger.info('Device access revoked', { 
       deviceId,
-      userId: (req as any).user?.id
+      userId: auth?.userId
     });
 
-    res.json({
+    return c.json({
       success: true,
       message: 'Device access revoked successfully'
     });
   } catch (error) {
     logger.error('Error revoking device:', error);
-    res.status(500).json({
+    return c.json({
       success: false,
       error: 'Failed to revoke device access'
-    });
+    }, 500);
   }
 });
 

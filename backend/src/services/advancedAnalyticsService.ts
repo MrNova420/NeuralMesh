@@ -266,7 +266,7 @@ class AdvancedAnalyticsService {
     // This would typically aggregate old metrics into summary statistics
     // For now, we just ensure buffer doesn't grow indefinitely
     if (this.metricsBuffer.length > this.BUFFER_SIZE * 0.9) {
-      console.log('Aggregating metrics...');
+      logger.info('Aggregating metrics...');
       // Keep only recent metrics
       const cutoff = Date.now() - 86400000; // 24 hours
       this.metricsBuffer = this.metricsBuffer.filter((m) => m.timestamp > cutoff);

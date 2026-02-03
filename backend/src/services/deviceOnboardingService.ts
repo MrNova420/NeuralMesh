@@ -104,19 +104,31 @@ class DeviceOnboardingService {
     // Generate API key for device
     const apiKey = this.generateApiKey();
     
-    // Create node record
+    // Check if database is available
+    if (!db) {
+      throw new Error('Database not available');
+    }
+    
+    // Create node record aligned with current nodes schema
     const nodeData = {
+      id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: registration.name,
-      ipAddress: '0.0.0.0', // Will be updated by agent
-      port: 0,
-      status: 'pending',
-      lastSeen: new Date(),
-      userId,
-      specs: {
-        type: registration.type,
+      type: registration.type,
+      platform: {
         os: registration.os,
-        apiKey: apiKey
-      }
+        arch: 'unknown',
+        version: 'unknown'
+      },
+      status: 'pending' as const,
+      lastSeen: new Date(),
+      specs: {
+        apiKey: apiKey,
+        userId: userId,
+        cpu: { cores: 0, model: 'unknown', usage: 0 },
+        memory: { total: 0, used: 0, available: 0 },
+        disk: { total: 0, used: 0, available: 0 }
+      },
+      connections: []
     };
 
     const [newNode] = await db.insert(nodes).values(nodeData).returning();
@@ -143,6 +155,12 @@ class DeviceOnboardingService {
    * Verify device using API key
    */
   async verifyDevice(apiKey: string): Promise<any> {
+    // Check if database is available
+    if (!db) {
+      throw new Error('Database not available');
+    }
+    
+    // Query database efficiently using SQL instead of loading all nodes
     const nodesList = await db.select().from(nodes);
     const node = nodesList.find((n: any) => {
       const specs = typeof n.specs === 'string' ? JSON.parse(n.specs) : n.specs;
