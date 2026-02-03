@@ -8,6 +8,11 @@ coverage/
 .vscode/
 .idea/
 
+# Environment and config files
+backend/.env
+frontend/.env
+DATABASE_ACCESS.txt
+
 # Rust build artifacts
 agent/target/
 Cargo.lock
