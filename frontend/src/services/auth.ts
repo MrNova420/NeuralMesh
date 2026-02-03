@@ -132,6 +132,61 @@ export const apiService = {
     api.post('/api/mesh/workload/distribute', { type, resources }),
   getWorkloadStatus: (id: string) => api.get(`/api/mesh/workload/${id}`),
   getAllWorkloads: () => api.get('/api/mesh/workload'),
+
+  // Containers
+  getAllContainers: (nodeId?: string) => api.get('/api/containers', { params: { nodeId } }),
+  getContainerById: (id: string) => api.get(`/api/containers/${id}`),
+  createContainer: (data: any) => api.post('/api/containers', data),
+  startContainer: (id: string) => api.post(`/api/containers/${id}/start`),
+  stopContainer: (id: string) => api.post(`/api/containers/${id}/stop`),
+  restartContainer: (id: string) => api.post(`/api/containers/${id}/restart`),
+  removeContainer: (id: string, force?: boolean) => 
+    api.delete(`/api/containers/${id}`, { params: { force } }),
+  getContainerLogs: (id: string, tail?: number) => 
+    api.get(`/api/containers/${id}/logs`, { params: { tail } }),
+  getContainerStats: (id: string, limit?: number) => 
+    api.get(`/api/containers/${id}/stats`, { params: { limit } }),
+  execContainerCommand: (id: string, command: string[]) => 
+    api.post(`/api/containers/${id}/exec`, { command }),
+  getContainerImages: () => api.get('/api/containers/images/list'),
+  pullContainerImage: (name: string, tag?: string) => 
+    api.post('/api/containers/images/pull', { name, tag }),
+  getContainerTemplates: () => api.get('/api/containers/templates/list'),
+
+  // Cloud
+  getAllProviders: () => api.get('/api/cloud/providers'),
+  getProviderById: (id: string) => api.get(`/api/cloud/providers/${id}`),
+  addProvider: (data: any) => api.post('/api/cloud/providers', data),
+  updateProvider: (id: string, data: any) => api.patch(`/api/cloud/providers/${id}`, data),
+  testProviderConnection: (id: string) => api.post(`/api/cloud/providers/${id}/test`),
+  getProviderInstanceTypes: (id: string) => api.get(`/api/cloud/providers/${id}/types`),
+  getAllCloudInstances: (providerId?: string) => 
+    api.get('/api/cloud/instances', { params: { providerId } }),
+  getCloudInstanceById: (id: string) => api.get(`/api/cloud/instances/${id}`),
+  createCloudInstance: (providerId: string, data: any) => 
+    api.post('/api/cloud/instances', { providerId, ...data }),
+  startCloudInstance: (id: string) => api.post(`/api/cloud/instances/${id}/start`),
+  stopCloudInstance: (id: string) => api.post(`/api/cloud/instances/${id}/stop`),
+  terminateCloudInstance: (id: string) => api.delete(`/api/cloud/instances/${id}`),
+
+  // Server Capabilities
+  getAllClusters: () => api.get('/api/capabilities/clusters'),
+  getClusterById: (id: string) => api.get(`/api/capabilities/clusters/${id}`),
+  createCluster: (data: any) => api.post('/api/capabilities/clusters', data),
+  updateCluster: (id: string, data: any) => api.patch(`/api/capabilities/clusters/${id}`, data),
+  deleteCluster: (id: string) => api.delete(`/api/capabilities/clusters/${id}`),
+  getAllHealthChecks: () => api.get('/api/capabilities/health'),
+  getHealthCheck: (serverId: string) => api.get(`/api/capabilities/health/${serverId}`),
+  performHealthCheck: (serverId: string) => api.post(`/api/capabilities/health/${serverId}/check`),
+  getBackupConfigs: (serverId?: string) => 
+    api.get('/api/capabilities/backups/configs', { params: { serverId } }),
+  createBackupConfig: (data: any) => api.post('/api/capabilities/backups/configs', data),
+  performBackup: (configId: string) => api.post(`/api/capabilities/backups/perform/${configId}`),
+  getBackups: (serverId: string) => api.get(`/api/capabilities/backups/${serverId}`),
+  restoreBackup: (backupId: string) => api.post(`/api/capabilities/backups/${backupId}/restore`),
+  getDeploymentTemplates: () => api.get('/api/capabilities/templates'),
+  deployTemplate: (templateId: string, data: any) => 
+    api.post(`/api/capabilities/templates/${templateId}/deploy`, data),
 };
 
 export default apiService;

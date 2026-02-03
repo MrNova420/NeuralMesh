@@ -14,6 +14,7 @@ import deviceRouter from './src/routes/devices';
 import meshRouter from './src/routes/mesh';
 import containersRouter from './src/routes/containers';
 import cloudRouter from './src/routes/cloud';
+import capabilitiesRouter from './src/routes/capabilities';
 import { setupWebSocket } from './src/websocket/server';
 import { setupAgentWebSocket } from './src/websocket/agentServer';
 import { errorHandler } from './src/middleware/error';
@@ -53,6 +54,10 @@ app.get('/', (c) => {
       meshControl: true,
       containerManagement: true,
       cloudIntegration: true,
+      serverClustering: true,
+      autoScaling: true,
+      backupAutomation: true,
+      deploymentTemplates: true,
     },
   });
 });
@@ -69,6 +74,7 @@ app.route('/api/devices', deviceRouter);
 app.route('/api/mesh', meshRouter);
 app.route('/api/containers', containersRouter);
 app.route('/api/cloud', cloudRouter);
+app.route('/api/capabilities', capabilitiesRouter);
 
 // 404 handler
 app.notFound((c) => {
