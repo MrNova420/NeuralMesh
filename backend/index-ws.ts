@@ -18,6 +18,7 @@ import capabilitiesRouter from './src/routes/capabilities';
 import templatesRouter from './src/routes/templates';
 import gameServersRouter from './src/routes/gameServers';
 import storageRouter from './src/routes/storage';
+import onboardingRouter from './src/routes/onboarding';
 import { setupWebSocket } from './src/websocket/server';
 import { setupAgentWebSocket } from './src/websocket/agentServer';
 import { errorHandler } from './src/middleware/error';
@@ -40,7 +41,7 @@ app.use('/*', cors({
 app.get('/', (c) => {
   return c.json({
     name: 'NeuralMesh API',
-    version: '0.7.0',
+    version: '1.0.0',
     status: 'operational',
     timestamp: new Date().toISOString(),
     websocket: 'enabled',
@@ -66,6 +67,7 @@ app.get('/', (c) => {
       storageManagement: true,
       distributedStorage: true,
       smartStorageAutomation: true,
+      deviceOnboarding: true,
     },
   });
 });
@@ -86,6 +88,7 @@ app.route('/api/capabilities', capabilitiesRouter);
 app.route('/api/templates', templatesRouter);
 app.route('/api/gameservers', gameServersRouter);
 app.route('/api/storage', storageRouter);
+app.route('/api/onboarding', onboardingRouter);
 
 // 404 handler
 app.notFound((c) => {
