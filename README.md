@@ -15,7 +15,7 @@ Turn any device into a high-performance server node. No subscription fees, no ho
 
 [→ Learn why NeuralMesh is FREE](./FREE_PLATFORM.md)
 
-![Version](https://img.shields.io/badge/version-0.6.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Cost](https://img.shields.io/badge/cost-FREE-brightgreen)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
@@ -34,14 +34,23 @@ Turn any device into a high-performance server node. No subscription fees, no ho
 - **Complete Privacy**: Your data never leaves your network
 - **Full Control**: Own and control everything
 
-### NEW in v0.6.0 🎮🌐💚
+### NEW in v1.0.0 - Production Release! 🎉
+- **📱 Device Onboarding**: Easy device registration with pairing codes and QR codes
+- **🔧 One-Click Installation**: Automated setup scripts for all platforms
+- **📦 Production Docker**: Production-ready Docker Compose configuration
+- **📚 Complete Documentation**: Installation guides, quick start, troubleshooting
+- **🖥️ Multi-Platform**: Linux, macOS, Windows support
+- **🔐 Enhanced Security**: Automatic secret generation and service management
+- **⚡ Agent Installers**: Dedicated installers for Linux, macOS, and Windows agents
+- **🚀 184 API Endpoints**: Complete REST API with device onboarding (8 new endpoints)
+
+### v0.6.0 Features 🎮🌐💚
 - **30+ FREE Templates**: All production-ready, zero cost
 - **🎮 10 Game Servers**: Minecraft, CS:GO, Valheim, ARK, Rust, TF2, Terraria, 7DTD, Factorio
 - **🌐 8 Web Hosting**: Static, Node.js, PHP, Python, Rails, Ghost, Portfolio, Landing
 - **🎯 7 Gaming Platforms**: HTML5, Multiplayer, Lobby, Leaderboard, Platform, CDN, Auth
 - **📊 Optimization Dashboard**: Resource efficiency controls (not cost tracking)
 - **💡 Template Gallery**: Visual browse and one-click deploy
-- **🆓 FREE Emphasis**: Clear messaging that self-hosting = $0
 
 ### v0.5.0 Features 🚀
 - **🐳 Container Management**: Full Docker container orchestration
@@ -93,21 +102,62 @@ Automatic categorization based on hardware:
 
 ## 📦 Quick Start
 
-### One-Command Deployment
+### ⚡ One-Click Installation (Recommended)
+
+**Linux/macOS:**
 ```bash
-git clone https://github.com/yourusername/neuralmesh.git
-cd neuralmesh
-./deploy.sh
+curl -fsSL https://raw.githubusercontent.com/MrNova420/NeuralMesh/main/install.sh | bash
+```
+
+**Windows (PowerShell as Administrator):**
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MrNova420/NeuralMesh/main/install-windows.ps1" -OutFile "install.ps1"
+Set-ExecutionPolicy Bypass -Scope Process
+.\install.ps1
+```
+
+**Time:** ~5-10 minutes for complete setup
+
+### 🐳 Docker Compose (Alternative)
+
+```bash
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 **Access Points:**
-- Frontend: http://localhost
-- Backend API: http://localhost:3001
-- Agent WebSocket: ws://localhost:4001/agent
-- Database: localhost:5432 (PostgreSQL)
-- Cache: localhost:6379 (Redis)
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **API Docs**: http://localhost:3000/docs
 
-### Manual Setup
+### 📱 Add Your First Device
+
+After installation:
+
+1. **Login** to http://localhost:5173
+2. **Generate pairing code** (Devices → Add Device)
+3. **On the device**, run:
+
+**Linux/macOS:**
+```bash
+curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code YOUR_CODE
+```
+
+**Windows:**
+```powershell
+Invoke-WebRequest http://localhost:3000/install-agent.ps1 -OutFile agent.ps1
+.\agent.ps1 -PairingCode YOUR_CODE
+```
+
+### 📚 Documentation
+
+- **[Installation Guide](./INSTALLATION_GUIDE.md)** - Complete installation instructions
+- **[Device Onboarding](./DEVICE_ONBOARDING_GUIDE.md)** - Add devices to your mesh
+- **[User Guide](./USER_GUIDE.md)** - Full feature documentation
+- **[Troubleshooting](./TROUBLESHOOTING.md)** - Common issues and solutions
+
+### Manual Setup (Advanced)
 
 **Backend (Bun + Hono)**
 ```bash
