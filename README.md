@@ -2,7 +2,7 @@
 
 **Universal Server Orchestration Platform** - Turn any device into a high-performance server node. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
-![Version](https://img.shields.io/badge/version-0.4.0-blue)
+![Version](https://img.shields.io/badge/version-0.5.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
 ![Bun](https://img.shields.io/badge/bun-1.3.8-orange)
@@ -23,7 +23,17 @@
 - **🔄 WebSocket Streaming**: Sub-50ms latency real-time updates
 - **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary, 10-50MB RAM)
 
-### NEW in v0.4.0 🎉🚀
+### NEW in v0.5.0 🚀🎉
+- **🐳 Container Management**: Full Docker container orchestration (create, start, stop, monitor)
+- **☁️ Multi-Cloud Integration**: AWS, GCP, Azure, DigitalOcean support
+- **🔧 Server Clustering**: Auto-scaling clusters with load balancing
+- **💾 Automated Backups**: Scheduled backups with encryption and compression
+- **🚀 Deployment Templates**: One-click WordPress, E-commerce, API, Analytics, K8s
+- **🏥 Health Checks**: Comprehensive server health monitoring
+- **📊 Advanced Metrics**: Container stats, cluster metrics, cloud costs
+- **🔄 CI/CD Pipeline**: GitHub Actions with automated testing and builds
+
+### v0.4.0 Features 🎉
 - **🔄 Device Transformation**: Turn ANY device into a high-performance production server
 - **📱 Mobile Edge Servers**: Transform Android phones into edge computing nodes
 - **🕸️ Neural Mesh Control**: Visualize and manage distributed mesh network
@@ -32,6 +42,8 @@
 - **📊 Mesh Topology**: Real-time visualization of network connections
 - **🔧 Hardware Optimization**: Real CPU governor, I/O scheduler, network tuning
 - **💪 Production-Grade**: Real optimizations, not fake/minimal implementations
+
+### v0.2.0 Features
 - **🔐 JWT Authentication**: Secure user management with refresh tokens
 - **💾 PostgreSQL Database**: Persistent storage with historical data
 - **⚡ Redis Caching**: 50-70% faster API responses
