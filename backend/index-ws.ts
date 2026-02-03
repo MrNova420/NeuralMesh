@@ -14,6 +14,7 @@ import { setupAgentWebSocket } from './src/websocket/agentServer';
 import { errorHandler } from './src/middleware/error';
 import { logger } from './src/utils/logger';
 import { testDatabaseConnection, closeDatabaseConnection } from './src/db';
+import { stopMonitoringCycle } from './src/services/smartMonitoring';
 
 const app = new Hono();
 
@@ -126,6 +127,7 @@ process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
   
   try {
+    stopMonitoringCycle();
     await closeDatabaseConnection();
     server.close(() => {
       logger.info('Server closed');
@@ -141,6 +143,7 @@ process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
   
   try {
+    stopMonitoringCycle();
     await closeDatabaseConnection();
     server.close(() => {
       logger.info('Server closed');

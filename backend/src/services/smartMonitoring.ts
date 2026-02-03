@@ -343,7 +343,31 @@ class SmartMonitoringService {
 
 export const smartMonitoring = new SmartMonitoringService();
 
-// Start monitoring cycle (every 10 seconds)
-setInterval(() => {
-  smartMonitoring.runMonitoringCycle();
-}, 10000);
+// Monitoring cycle control
+let monitoringInterval: NodeJS.Timeout | null = null;
+
+export function startMonitoringCycle(intervalMs: number = 10000): void {
+  if (monitoringInterval) {
+    logger.warn('Monitoring cycle already running');
+    return;
+  }
+
+  monitoringInterval = setInterval(() => {
+    smartMonitoring.runMonitoringCycle();
+  }, intervalMs);
+
+  logger.info('Smart monitoring cycle started');
+}
+
+export function stopMonitoringCycle(): void {
+  if (monitoringInterval) {
+    clearInterval(monitoringInterval);
+    monitoringInterval = null;
+    logger.info('Smart monitoring cycle stopped');
+  }
+}
+
+// Auto-start monitoring cycle (can be disabled with environment variable)
+if (process.env.AUTO_START_MONITORING !== 'false') {
+  startMonitoringCycle();
+}

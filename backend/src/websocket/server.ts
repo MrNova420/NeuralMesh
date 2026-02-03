@@ -8,8 +8,14 @@ import { logger } from '../utils/logger';
 const BATCH_INTERVAL = 2000; // 2 seconds
 const UPDATE_BATCH_SIZE = 50; // Max nodes per batch
 
+interface BatchUpdate {
+  nodeId: string;
+  timestamp: string;
+  data: any;
+}
+
 export function setupWebSocket(io: Server) {
-  let updateBatch: any[] = [];
+  let updateBatch: BatchUpdate[] = [];
   let batchTimer: NodeJS.Timeout | null = null;
 
   // Function to flush batch updates
