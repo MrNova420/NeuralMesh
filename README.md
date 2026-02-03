@@ -4,6 +4,25 @@
 
 Turn any device into a high-performance server node. No subscription fees, no hosting charges, no hidden costs. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
+---
+
+## 🚨 PROJECT BROKEN? START HERE! 
+
+**If nothing works after cloning**, run this **ONE command** to fix everything:
+
+```bash
+chmod +x quick-fix.sh && ./quick-fix.sh
+```
+
+**Then start the app:**
+```bash
+./start.sh
+```
+
+**📖 See all installation methods:** [INSTALL_METHODS.md](./INSTALL_METHODS.md)
+
+---
+
 ## 🎉 Completely FREE Forever
 
 - ✅ **$0/month** - No subscription fees
@@ -102,9 +121,25 @@ Automatic categorization based on hardware:
 
 ## 📦 Quick Start
 
-### ⚡ One-Click Installation (Recommended)
+### 🚀 FASTEST: Quick Fix (2 minutes)
 
-**Linux/macOS:**
+**For WSL Ubuntu, Termux, or any Linux/macOS when you just want it working:**
+
+```bash
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+chmod +x quick-fix.sh && ./quick-fix.sh
+./start.sh
+```
+
+**Access:** http://localhost:5173  
+**Time:** ~2 minutes (no database required)
+
+### ⚡ One-Click Full Installation (10 minutes)
+
+**For production with PostgreSQL + Redis:**
+
+**Linux/macOS/WSL:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/MrNova420/NeuralMesh/main/install.sh | bash
 ```
@@ -116,7 +151,7 @@ Set-ExecutionPolicy Bypass -Scope Process
 .\install.ps1
 ```
 
-**Time:** ~5-10 minutes for complete setup
+**Time:** ~10 minutes for complete setup
 
 ### 🐳 Docker Compose (Alternative)
 
@@ -130,6 +165,16 @@ docker-compose -f docker-compose.prod.yml up -d
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 - **API Docs**: http://localhost:3000/docs
+
+### 📚 More Installation Methods
+
+See **[INSTALL_METHODS.md](./INSTALL_METHODS.md)** for:
+- Quick fix vs Full setup comparison
+- WSL Ubuntu specific instructions
+- Termux (Android) specific instructions  
+- Development setup
+- Manual installation
+- Troubleshooting
 
 ### 📱 Add Your First Device
 
