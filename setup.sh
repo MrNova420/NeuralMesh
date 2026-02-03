@@ -74,9 +74,15 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     PKG_MANAGER="brew"
     echo -e "${GREEN}✓${NC} Detected: macOS"
 elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]]; then
-    OS="windows"
-    PKG_MANAGER="chocolatey"
-    echo -e "${GREEN}✓${NC} Detected: Windows (Git Bash/Cygwin)"
+    echo -e "${RED}✗${NC} Windows Git Bash/Cygwin detected"
+    echo
+    echo -e "${YELLOW}This installer requires native Unix tooling.${NC}"
+    echo
+    echo -e "${BLUE}Please use one of these options:${NC}"
+    echo -e "  1. Run ${GREEN}install-windows.ps1${NC} in PowerShell"
+    echo -e "  2. Use ${GREEN}WSL${NC} (Windows Subsystem for Linux)"
+    echo
+    exit 1
 else
     OS="unknown"
     PKG_MANAGER="unknown"
@@ -91,6 +97,10 @@ echo -e "${YELLOW}Checking prerequisites...${NC}"
 # Check Node.js
 if ! command -v node &> /dev/null; then
     echo -e "${YELLOW}Node.js not found. Installing...${NC}"
+    
+    # Note: Installing Node.js from NodeSource repositories
+    # For production environments, consider using your distribution's official
+    # Node.js packages or manually verify the NodeSource setup script
     
     if [[ "$OS" == "debian" ]] || [[ "$OS" == "wsl" ]]; then
         curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -
@@ -334,7 +344,7 @@ echo
 echo -e "${BLUE}Creating frontend environment configuration...${NC}"
 cat > "$SCRIPT_DIR/frontend/.env" << EOF
 VITE_API_URL=http://localhost:3000
-VITE_WS_URL=ws://localhost:3000
+VITE_WS_URL=http://localhost:3000
 EOF
 
 echo -e "  ${GREEN}✓${NC} File created: frontend/.env"
@@ -353,26 +363,51 @@ cd "$SCRIPT_DIR/backend"
 echo -e "${BLUE}Initializing database schema...${NC}"
 echo -e "  ${BLUE}→${NC} Creating tables, indexes, and relationships..."
 
+# Enable pipefail to catch errors in pipelines
+set -o pipefail
+
 # Try to run migrations with better error handling
-if npm run db:push 2>&1 | grep -v "Warning" | tee /tmp/neuralmesh-migration.log | grep -q "permission denied"; then
-    echo -e "${RED}✗${NC} Database migration failed due to permissions"
-    echo -e "${YELLOW}Attempting to fix permissions...${NC}"
-    
-    # Fix permissions
-    if [[ "$OS" == "macos" ]]; then
-        echo -e "  ${BLUE}→${NC} Re-granting schema ownership to $DB_USER..."
-        psql -U $(whoami) -d $DB_NAME -c "ALTER SCHEMA public OWNER TO $DB_USER;" 2>/dev/null || true
-        psql -U $(whoami) -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>/dev/null || true
+MIGRATION_OUTPUT=$(mktemp)
+if npm run db:push 2>&1 | tee "$MIGRATION_OUTPUT"; then
+    echo -e "${GREEN}✓${NC} Database schema initialized successfully"
+else
+    MIGRATION_EXIT_CODE=$?
+    # Check if it's a permission error
+    if grep -q "permission denied" "$MIGRATION_OUTPUT"; then
+        echo -e "${RED}✗${NC} Database migration failed due to permissions"
+        echo -e "${YELLOW}Attempting to fix permissions...${NC}"
+        
+        # Fix permissions
+        if [[ "$OS" == "macos" ]]; then
+            echo -e "  ${BLUE}→${NC} Re-granting schema ownership to $DB_USER..."
+            psql -U $(whoami) -d $DB_NAME -c "ALTER SCHEMA public OWNER TO $DB_USER;" 2>/dev/null || true
+            psql -U $(whoami) -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>/dev/null || true
+        else
+            echo -e "  ${BLUE}→${NC} Re-granting schema ownership to $DB_USER (requires sudo)..."
+            sudo -u postgres psql -d $DB_NAME -c "ALTER SCHEMA public OWNER TO $DB_USER;" 2>/dev/null || true
+            sudo -u postgres psql -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>/dev/null || true
+        fi
+        
+        # Retry migration
+        echo -e "  ${BLUE}→${NC} Retrying migration..."
+        if npm run db:push 2>&1 | tee "$MIGRATION_OUTPUT"; then
+            echo -e "${GREEN}✓${NC} Database schema initialized after permission fix"
+        else
+            echo -e "${RED}✗${NC} Database migration failed after retry"
+            echo -e "${YELLOW}Please check the errors above and try running setup again${NC}"
+            rm -f "$MIGRATION_OUTPUT"
+            exit 1
+        fi
     else
-        echo -e "  ${BLUE}→${NC} Re-granting schema ownership to $DB_USER (requires sudo)..."
-        sudo -u postgres psql -d $DB_NAME -c "ALTER SCHEMA public OWNER TO $DB_USER;" 2>/dev/null || true
-        sudo -u postgres psql -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>/dev/null || true
+        echo -e "${RED}✗${NC} Database migration failed (exit code: $MIGRATION_EXIT_CODE)"
+        echo -e "${YELLOW}Please check the errors above and try running setup again${NC}"
+        rm -f "$MIGRATION_OUTPUT"
+        exit 1
     fi
-    
-    # Retry migration
-    echo -e "  ${BLUE}→${NC} Retrying migration..."
-    npm run db:push 2>&1 | grep -v "Warning" || true
 fi
+
+rm -f "$MIGRATION_OUTPUT"
+set +o pipefail
 
 echo
 echo -e "${GREEN}✓${NC} Database schema initialized!"

@@ -60,20 +60,20 @@ if (-not $ServerUrl) {
     $ServerUrl = "ws://${ServerIP}:3001/agent"
 }
 
-# Prompt for pairing code if not provided
+# Prompt for pairing code if not provided (OPTIONAL - for future use)
 if (-not $PairingCode) {
     Write-Host ""
-    Write-ColorOutput Blue "Get your pairing code from:"
-    Write-Host "  1. Open NeuralMesh dashboard"
-    Write-Host "  2. Go to Devices → Add Device"
-    Write-Host "  3. Copy the pairing code"
+    Write-ColorOutput Blue "Pairing Code (Optional):"
+    Write-Host "  Note: Pairing code is 6 characters (e.g., ABC123)"
+    Write-Host "  Get from: Dashboard → Devices → Add Device"
+    Write-Host "  Press Enter to skip (direct connection mode)"
     Write-Host ""
-    $PairingCode = Read-Host "Enter pairing code (e.g., ABCD-1234-EFGH)"
+    $PairingCode = Read-Host "Enter pairing code or press Enter to skip"
 }
 
-# Validate inputs
-if ([string]::IsNullOrWhiteSpace($ServerUrl) -or [string]::IsNullOrWhiteSpace($PairingCode)) {
-    Write-ColorOutput Red "Error: Server URL and pairing code are required"
+# Validate server URL is provided
+if ([string]::IsNullOrWhiteSpace($ServerUrl)) {
+    Write-ColorOutput Red "Error: Server URL is required"
     exit 1
 }
 

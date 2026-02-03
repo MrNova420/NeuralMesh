@@ -53,7 +53,7 @@ On your **main NeuralMesh server** (the orchestrator):
 1. Open dashboard: `http://localhost:5173` or `http://YOUR_SERVER_IP:5173`
 2. Click **"Devices"** or **"Nodes"** in sidebar
 3. Click **"+ Add Device"** button
-4. A **pairing code** appears (e.g., `ABCD-1234-EFGH`)
+4. A **pairing code** appears (e.g., `ABC123`)
 
 **Important:**
 - ⏰ **Code expires in 15 minutes** (for security)
@@ -66,18 +66,18 @@ On the **device you want to add** (laptop, phone, Raspberry Pi, etc.):
 
 **Linux/macOS/Termux:**
 ```bash
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 **Windows (PowerShell):**
 ```powershell
 Invoke-WebRequest http://YOUR_SERVER_IP:3000/install-agent.ps1 -OutFile agent.ps1
-.\agent.ps1 -PairingCode "ABCD-1234-EFGH"
+.\agent.ps1 -PairingCode "ABC123"
 ```
 
 Replace:
 - `YOUR_SERVER_IP` with your main server's IP address
-- `ABCD-1234-EFGH` with your actual pairing code
+- `ABC123` with your actual pairing code
 
 #### 3️⃣ **Automatic Connection**
 
@@ -195,7 +195,7 @@ Within seconds:
 
 - [ ] **Generate pairing code**
   - Dashboard → Devices → Add Device
-  - Note the code (e.g., `ABCD-1234-EFGH`)
+  - Note the code (e.g., `ABC123`)
   - Note it expires in 15 minutes
 
 - [ ] **Install agent on test device**

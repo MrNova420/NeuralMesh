@@ -59,14 +59,29 @@ while [[ $# -gt 0 ]]; do
             echo
             echo "Options:"
             echo "  --server URL          WebSocket server URL (e.g., ws://192.168.1.100:3001/agent)"
-            echo "  --pairing-code CODE   Pairing code from NeuralMesh dashboard"
+            echo "  --pairing-code CODE   Pairing code from dashboard (6 chars, optional)"
             echo "  --name NAME           Friendly name for this device (default: hostname)"
             echo "  --interval SECONDS    Update interval in seconds (default: 2)"
             echo "  --install-dir DIR     Installation directory (default: ~/neuralmesh-agent)"
             echo "  -h, --help            Show this help message"
             echo
-            echo "Example:"
-            echo "  $0 --server ws://192.168.1.100:3001/agent --pairing-code ABCD-1234-EFGH"
+            echo "Examples:"
+            echo "  # Basic installation (will prompt for server)"
+            echo "  $0"
+            echo
+            echo "  # With server URL"
+            echo "  $0 --server ws://192.168.1.100:3001/agent"
+            echo
+            echo "  # Full options"
+            echo "  $0 \\"
+            echo "    --server ws://192.168.1.100:3001/agent \\"
+            echo "    --name \"My Device\" \\"
+            echo "    --interval 2"
+            echo
+            echo "  # With pairing code (optional, for future authentication)"
+            echo "  $0 \\"
+            echo "    --server ws://192.168.1.100:3001/agent \\"
+            echo "    --pairing-code ABC123"
             echo
             exit 0
             ;;
@@ -106,20 +121,20 @@ if [ -z "$SERVER_URL" ]; then
     SERVER_URL="ws://${SERVER_IP}:3001/agent"
 fi
 
-# Prompt for pairing code if not provided
+# Prompt for pairing code if not provided (OPTIONAL - for future use)
 if [ -z "$PAIRING_CODE" ]; then
     echo
-    echo -e "${BLUE}Get your pairing code from:${NC}"
-    echo -e "  1. Open NeuralMesh dashboard"
-    echo -e "  2. Go to Devices → Add Device"
-    echo -e "  3. Copy the pairing code"
+    echo -e "${BLUE}Pairing Code (Optional):${NC}"
+    echo -e "  ${YELLOW}Note:${NC} Pairing code is 6 characters (e.g., ABC123)"
+    echo -e "  Get from: Dashboard → Devices → Add Device"
+    echo -e "  ${YELLOW}Press Enter to skip (direct connection mode)${NC}"
     echo
-    read -p "Enter pairing code (e.g., ABCD-1234-EFGH): " PAIRING_CODE
+    read -p "Enter pairing code or press Enter to skip: " PAIRING_CODE
 fi
 
-# Validate inputs
-if [ -z "$SERVER_URL" ] || [ -z "$PAIRING_CODE" ]; then
-    echo -e "${RED}Error: Server URL and pairing code are required${NC}"
+# Validate server URL is provided
+if [ -z "$SERVER_URL" ]; then
+    echo -e "${RED}Error: Server URL is required${NC}"
     exit 1
 fi
 
@@ -298,7 +313,12 @@ elif [[ "$PLATFORM" == "macos" ]]; then
 </plist>
 EOF
 
-    launchctl load "$PLIST_PATH" 2>/dev/null || launchctl bootout gui/$(id -u)/com.neuralmesh.agent 2>/dev/null && launchctl bootstrap gui/$(id -u) "$PLIST_PATH"
+    # Try to load the plist
+    if ! launchctl load "$PLIST_PATH" 2>/dev/null; then
+        # If load fails, try bootout and bootstrap
+        launchctl bootout "gui/$(id -u)/com.neuralmesh.agent" 2>/dev/null
+        launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"
+    fi
     
     echo -e "${GREEN}✓${NC} Service configured and started (launchd)"
     echo

@@ -20,8 +20,8 @@ NeuralMesh turns ANY device into a powerful node in your infrastructure:
 1. **Open NeuralMesh Dashboard** in your browser: `http://localhost:5173`
 2. **Click "Devices"** in the sidebar (or "Nodes" page)
 3. **Click "+ Add Device"** button
-4. A **pairing code** appears (like `ABCD-1234-EFGH`)
-5. **Keep this page open!** The code expires in 10 minutes
+4. A **pairing code** appears (like `ABC123`)
+5. **Keep this page open!** The code expires in 15 minutes
 
 ### Step 2: Install Agent on Device
 
@@ -31,30 +31,30 @@ Choose your device's operating system:
 
 **One-Line Install:**
 ```bash
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
-Replace `YOUR_SERVER_IP` with your NeuralMesh server's IP address, and `ABCD-1234-EFGH` with your actual pairing code.
+Replace `YOUR_SERVER_IP` with your NeuralMesh server's IP address, and `ABC123` with your actual pairing code.
 
 **Example:**
 ```bash
 # If NeuralMesh is on the same computer:
-curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 
 # If NeuralMesh is on 192.168.1.100:
-curl -fsSL http://192.168.1.100:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://192.168.1.100:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 #### 🍎 macOS
 
 **One-Line Install:**
 ```bash
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 **Example:**
 ```bash
-curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 #### 🪟 Windows
@@ -65,13 +65,13 @@ curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code AB
 Invoke-WebRequest -Uri "http://YOUR_SERVER_IP:3000/install-agent.ps1" -OutFile "agent.ps1"
 
 # Run installer with pairing code
-.\agent.ps1 -PairingCode "ABCD-1234-EFGH"
+.\agent.ps1 -PairingCode "ABC123"
 ```
 
 **Example:**
 ```powershell
 Invoke-WebRequest -Uri "http://localhost:3000/install-agent.ps1" -OutFile "agent.ps1"
-.\agent.ps1 -PairingCode "ABCD-1234-EFGH"
+.\agent.ps1 -PairingCode "ABC123"
 ```
 
 #### 📱 Android (Termux)
@@ -84,19 +84,19 @@ Invoke-WebRequest -Uri "http://localhost:3000/install-agent.ps1" -OutFile "agent
 pkg install curl
 
 # Install agent
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 **Example:**
 ```bash
-curl -fsSL http://192.168.1.100:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://192.168.1.100:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 #### 🍓 Raspberry Pi
 
 Same as Linux! Just use:
 ```bash
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 ### Step 3: Watch It Connect! 🎉

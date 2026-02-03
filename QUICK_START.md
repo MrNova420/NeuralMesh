@@ -134,23 +134,23 @@ Let's connect a device to your NeuralMesh!
 ### Quick Method (Recommended)
 
 1. **In Dashboard:** Click "Devices" → "+ Add Device"
-2. **Copy pairing code** (e.g., `ABCD-1234-EFGH`)
+2. **Copy pairing code** (e.g., `ABC123`)
 3. **On device:** Run one command:
 
 **Linux/macOS/Termux:**
 ```bash
-curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABC123
 ```
 
 **Windows (PowerShell):**
 ```powershell
 Invoke-WebRequest http://YOUR_SERVER_IP:3000/install-agent.ps1 -OutFile agent.ps1
-.\agent.ps1 -PairingCode "ABCD-1234-EFGH"
+.\agent.ps1 -PairingCode "ABC123"
 ```
 
 Replace:
 - `YOUR_SERVER_IP` with your server IP (`localhost` if same device)
-- `ABCD-1234-EFGH` with your actual pairing code
+- `ABC123` with your actual pairing code
 
 **Done!** Device connects in seconds! 🎊
 
