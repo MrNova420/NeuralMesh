@@ -620,7 +620,10 @@ echo -e "   User:          ${GREEN}$DB_USER${NC} ${YELLOW}(FULL OWNER)${NC}"
 echo -e "   Password:      ${GREEN}$DB_PASSWORD${NC}"
 echo -e "   Host:          ${GREEN}localhost:5432${NC}"
 echo
-echo -e "${YELLOW}⚠️  Security Note: Password shown above. Consider clearing terminal history.${NC}"
+echo -e "${YELLOW}⚠️  Security Notes:${NC}"
+echo -e "   • Password shown above is saved in DATABASE_ACCESS.txt"
+echo -e "   • Consider clearing terminal history: ${YELLOW}history -c${NC}"
+echo -e "   • Password also in backend/.env (protected by file permissions)"
 echo
 echo -e "${BLUE}🔑 Quick Access Commands:${NC}"
 echo -e "   Connect:       ${YELLOW}psql -U $DB_USER -d $DB_NAME${NC}"

@@ -135,8 +135,18 @@ if npm run db:push > /tmp/neuralmesh-migration-check.log 2>&1; then
 else
     EXIT_CODE=$?
     echo -e "${YELLOW}⚠${NC} Database migration had issues (exit code: $EXIT_CODE)"
-    echo -e "  You may need to run: ${YELLOW}./setup.sh${NC} for full database setup"
-    echo -e "  Or check logs: ${YELLOW}cat /tmp/neuralmesh-migration-check.log${NC}"
+    echo
+    echo -e "${BLUE}Common causes:${NC}"
+    echo -e "  • PostgreSQL is not running"
+    echo -e "  • Database doesn't exist"
+    echo -e "  • Permission issues"
+    echo -e "  • Incorrect database URL in .env"
+    echo
+    echo -e "${BLUE}Quick fixes:${NC}"
+    echo -e "  1. Check PostgreSQL: ${YELLOW}sudo systemctl status postgresql${NC}"
+    echo -e "  2. Run full setup: ${YELLOW}./setup.sh${NC}"
+    echo -e "  3. Check logs: ${YELLOW}cat /tmp/neuralmesh-migration-check.log${NC}"
+    echo
 fi
 
 # Start services
