@@ -39,12 +39,12 @@ services:
       dockerfile: Dockerfile.backend
     container_name: neuralmesh-backend
     ports:
+      - "3000:3000"
       - "3001:3001"
-      - "4001:4001"
     environment:
       - NODE_ENV=production
-      - PORT=3001
-      - AGENT_PORT=4001
+      - PORT=3000
+      - AGENT_PORT=3001
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/neuralmesh
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
@@ -80,7 +80,7 @@ services:
       dockerfile: Dockerfile.agent
     container_name: neuralmesh-agent-1
     environment:
-      - SERVER_URL=ws://backend:4001/agent
+      - SERVER_URL=ws://backend:3001/agent
       - UPDATE_INTERVAL=2
       - NODE_NAME=docker-agent
     depends_on:

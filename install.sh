@@ -58,6 +58,14 @@ REPO_URL="https://github.com/MrNova420/NeuralMesh.git"
 
 echo
 echo -e "${YELLOW}Installation directory: $INSTALL_DIR${NC}"
+echo -e "${BLUE}This will:${NC}"
+echo -e "  ${GREEN}✓${NC} Clone the NeuralMesh repository"
+echo -e "  ${GREEN}✓${NC} Install all dependencies (Node.js, PostgreSQL, Redis)"
+echo -e "  ${GREEN}✓${NC} Create database with proper ownership"
+echo -e "  ${GREEN}✓${NC} Generate secure secrets (JWT, passwords)"
+echo -e "  ${GREEN}✓${NC} Configure firewall rules"
+echo -e "  ${GREEN}✓${NC} Build frontend application"
+echo -e "  ${GREEN}✓${NC} Set up systemd service (Linux)"
 echo
 
 # Confirm installation

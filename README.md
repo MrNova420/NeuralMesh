@@ -137,25 +137,34 @@ After installation:
 
 1. **Login** to http://localhost:5173
 2. **Generate pairing code** (Devices → Add Device)
-3. **On the device**, run:
+3. **On the device**, run the one-line installer:
 
-**Linux/macOS:**
+**Linux/macOS/Termux:**
 ```bash
-curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code YOUR_CODE
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code YOUR_CODE
 ```
 
-**Windows:**
+**Windows (PowerShell):**
 ```powershell
-Invoke-WebRequest http://localhost:3000/install-agent.ps1 -OutFile agent.ps1
+Invoke-WebRequest http://YOUR_SERVER_IP:3000/install-agent.ps1 -OutFile agent.ps1
 .\agent.ps1 -PairingCode YOUR_CODE
 ```
 
+Replace `YOUR_SERVER_IP` with your NeuralMesh server IP (use `localhost` if on same device).  
+Replace `YOUR_CODE` with your actual pairing code.
+
+**That's it!** Your device appears in the dashboard within seconds! 🎉
+
+📚 **Detailed guide**: [Device Management Guide](./DEVICE_MANAGEMENT.md)
+
 ### 📚 Documentation
 
+- **[Quick Start Guide](./QUICK_START.md)** - Get started in 5 minutes
 - **[Installation Guide](./INSTALLATION_GUIDE.md)** - Complete installation instructions
-- **[Device Onboarding](./DEVICE_ONBOARDING_GUIDE.md)** - Add devices to your mesh
-- **[User Guide](./USER_GUIDE.md)** - Full feature documentation
+- **[Device Management](./DEVICE_MANAGEMENT.md)** - Add and manage devices easily
 - **[Troubleshooting](./TROUBLESHOOTING.md)** - Common issues and solutions
+- **[User Guide](./USER_GUIDE.md)** - Full feature documentation
+- **[API Documentation](./API.md)** - REST API reference
 
 ### Manual Setup (Advanced)
 
@@ -271,6 +280,10 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 
 | Document | Description |
 |----------|-------------|
+| [QUICK_START.md](./QUICK_START.md) | Get started in 5 minutes - beginner friendly! |
+| [DEVICE_MANAGEMENT.md](./DEVICE_MANAGEMENT.md) | Add and manage devices - easy guide |
+| [INSTALLATION_GUIDE.md](./INSTALLATION_GUIDE.md) | Complete installation instructions |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Common issues and solutions |
 | [SETUP.md](./SETUP.md) | Complete setup guide (quick start, production, troubleshooting) |
 | [FEATURES_GUIDE.md](./FEATURES_GUIDE.md) | Complete v0.3.0 features and usage guide |
 | [SERVER_MANAGEMENT.md](./SERVER_MANAGEMENT.md) | Server management API and best practices |
