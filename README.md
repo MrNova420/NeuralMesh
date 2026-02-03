@@ -1,9 +1,23 @@
 # NeuralMesh
 
-**Universal Server Orchestration Platform** - Turn any device into a high-performance server node. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
+**💚 100% FREE Self-Hosted Infrastructure Orchestration Platform**
 
-![Version](https://img.shields.io/badge/version-0.5.0-blue)
+Turn any device into a high-performance server node. No subscription fees, no hosting charges, no hidden costs. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
+
+## 🎉 Completely FREE Forever
+
+- ✅ **$0/month** - No subscription fees
+- ✅ **$0 setup** - No hosting charges  
+- ✅ **$0 limits** - Unlimited servers, nodes, resources
+- ✅ **100% yours** - Self-hosted on your infrastructure
+- ✅ **Full control** - No vendor lock-in
+- ✅ **Private** - Your data stays on your hardware
+
+[→ Learn why NeuralMesh is FREE](./FREE_PLATFORM.md)
+
+![Version](https://img.shields.io/badge/version-0.6.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Cost](https://img.shields.io/badge/cost-FREE-brightgreen)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
 ![Bun](https://img.shields.io/badge/bun-1.3.8-orange)
 ![React](https://img.shields.io/badge/react-19-61dafb)
@@ -13,25 +27,40 @@
 
 ## 🚀 Features
 
+### 💚 FREE Self-Hosting Platform
+- **No Costs Ever**: Zero subscription, hosting, or hidden fees
+- **Your Infrastructure**: Use any device you own
+- **Unlimited Everything**: No artificial limits or quotas
+- **Complete Privacy**: Your data never leaves your network
+- **Full Control**: Own and control everything
+
+### NEW in v0.6.0 🎮🌐💚
+- **30+ FREE Templates**: All production-ready, zero cost
+- **🎮 10 Game Servers**: Minecraft, CS:GO, Valheim, ARK, Rust, TF2, Terraria, 7DTD, Factorio
+- **🌐 8 Web Hosting**: Static, Node.js, PHP, Python, Rails, Ghost, Portfolio, Landing
+- **🎯 7 Gaming Platforms**: HTML5, Multiplayer, Lobby, Leaderboard, Platform, CDN, Auth
+- **📊 Optimization Dashboard**: Resource efficiency controls (not cost tracking)
+- **💡 Template Gallery**: Visual browse and one-click deploy
+- **🆓 FREE Emphasis**: Clear messaging that self-hosting = $0
+
+### v0.5.0 Features 🚀
+- **🐳 Container Management**: Full Docker container orchestration
+- **☁️ Multi-Cloud Integration**: AWS, GCP, Azure, DigitalOcean support
+- **🔧 Server Clustering**: Auto-scaling with load balancing
+- **💾 Automated Backups**: Scheduled with encryption
+- **🚀 Deployment Templates**: WordPress, E-commerce, API, Analytics, K8s
+- **🏥 Health Checks**: Comprehensive monitoring
+- **🔄 CI/CD Pipeline**: Automated testing and builds
+
 ### Core Capabilities
 - **🌐 Universal Device Support**: PC, Android, Raspberry Pi, IoT devices
 - **⚡ Real-Time Monitoring**: Live CPU, memory, disk, network metrics (2s updates)
-- **🧠 Neural Network Visualization**: Interactive 3D mesh topology with Three.js
-- **📊 Smart Dashboards**: Beautiful animated UI with 481 react-bits components
-- **🔔 Intelligent Alerts**: Auto-generated health notifications (CPU/Memory/Storage)
-- **🐳 Docker Ready**: One-command deployment with docker-compose
-- **🔄 WebSocket Streaming**: Sub-50ms latency real-time updates
-- **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary, 10-50MB RAM)
-
-### NEW in v0.5.0 🚀🎉
-- **🐳 Container Management**: Full Docker container orchestration (create, start, stop, monitor)
-- **☁️ Multi-Cloud Integration**: AWS, GCP, Azure, DigitalOcean support
-- **🔧 Server Clustering**: Auto-scaling clusters with load balancing
-- **💾 Automated Backups**: Scheduled backups with encryption and compression
-- **🚀 Deployment Templates**: One-click WordPress, E-commerce, API, Analytics, K8s
-- **🏥 Health Checks**: Comprehensive server health monitoring
-- **📊 Advanced Metrics**: Container stats, cluster metrics, cloud costs
-- **🔄 CI/CD Pipeline**: GitHub Actions with automated testing and builds
+- **🧠 Neural Network Visualization**: Interactive 3D mesh topology
+- **📊 Smart Dashboards**: Beautiful animated UI
+- **🔔 Intelligent Alerts**: Auto-generated health notifications
+- **🐳 Docker Ready**: One-command deployment
+- **🔄 WebSocket Streaming**: Sub-50ms latency
+- **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary)
 
 ### v0.4.0 Features 🎉
 - **🔄 Device Transformation**: Turn ANY device into a high-performance production server
