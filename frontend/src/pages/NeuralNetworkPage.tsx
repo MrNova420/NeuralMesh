@@ -71,6 +71,10 @@ export function NeuralNetworkPage() {
 
   const selectedNodeData = nodes.find((n) => n.id === selectedNode);
 
+  const handleNodeClick = (nodeId: string) => {
+    setSelectedNode(nodeId);
+  };
+
   return (
     <div className="relative h-full overflow-hidden">
       {/* Background Effect - Beams (only when not fullscreen) */}
