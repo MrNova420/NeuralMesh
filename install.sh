@@ -69,7 +69,7 @@ echo -e "  ${GREEN}✓${NC} Set up systemd service (Linux)"
 echo
 
 # Confirm installation
-read -p "Continue with installation? (y/n) " -n 1 -r
+read -p "Continue with installation? (y/n) " -n 1 -r </dev/tty
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Installation cancelled"
