@@ -73,3 +73,26 @@ export const nodeActionSchema = z.object({
   action: z.enum(['restart', 'shutdown', 'disconnect', 'reconnect']),
   nodeId: z.string(),
 });
+
+// Server validation schemas
+export const serverSpecsSchema = z.object({
+  cpu: z.number().min(1).max(128),
+  memory: z.number().min(1).max(1024), // GB
+  storage: z.number().min(10).max(10000), // GB
+  os: z.string().min(1).max(100),
+});
+
+export const serverCreateSchema = z.object({
+  name: z.string().min(1).max(100),
+  type: z.enum(['vm', 'container', 'bare-metal', 'cloud']),
+  provider: z.string().max(50).optional(),
+  template: z.string().max(50).optional(),
+  specs: serverSpecsSchema,
+  config: z.record(z.any()).optional(),
+});
+
+export const serverUpdateSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  specs: serverSpecsSchema.partial().optional(),
+  config: z.record(z.any()).optional(),
+});

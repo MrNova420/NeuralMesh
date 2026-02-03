@@ -111,3 +111,23 @@ export const sessions = pgTable('sessions', {
   userIdIdx: index('sessions_user_id_idx').on(table.userId),
   refreshTokenIdx: index('sessions_refresh_token_idx').on(table.refreshToken),
 }));
+
+// Servers table for virtual machines and containers
+export const servers = pgTable('servers', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type').notNull(), // vm, container, bare-metal, cloud
+  provider: text('provider'),
+  template: text('template'),
+  status: text('status').notNull(), // creating, running, stopped, error, deleted
+  specs: jsonb('specs').notNull(), // {cpu, memory, storage, os}
+  network: jsonb('network').notNull(), // {ip, ports}
+  config: jsonb('config').default({}),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('servers_user_id_idx').on(table.userId),
+  statusIdx: index('servers_status_idx').on(table.status),
+  typeIdx: index('servers_type_idx').on(table.type),
+}));
