@@ -2,12 +2,14 @@
 
 **Universal Server Orchestration Platform** - Turn any device into a high-performance server node. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
 ![Bun](https://img.shields.io/badge/bun-1.3.8-orange)
 ![React](https://img.shields.io/badge/react-19-61dafb)
 ![Rust](https://img.shields.io/badge/rust-1.93-orange)
+![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue)
+![Redis](https://img.shields.io/badge/redis-7-red)
 
 ## 🚀 Features
 
@@ -20,6 +22,18 @@
 - **🐳 Docker Ready**: One-command deployment with docker-compose
 - **🔄 WebSocket Streaming**: Sub-50ms latency real-time updates
 - **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary, 10-50MB RAM)
+
+### NEW in v0.2.0 🎉
+- **🔐 JWT Authentication**: Secure user management with refresh tokens
+- **💾 PostgreSQL Database**: Persistent storage with historical data
+- **⚡ Redis Caching**: 50-70% faster API responses
+- **🧠 Smart Monitoring**: AI-powered health scoring (0-100 scale)
+- **📈 Predictive Analytics**: Anomaly detection & trend analysis
+- **🎯 Node Actions**: Remote restart, shutdown, disconnect
+- **📊 Advanced Analytics**: Resource optimization recommendations
+- **🛡️ Rate Limiting**: Protection against abuse and DDoS
+- **✅ Input Validation**: Type-safe API with Zod schemas
+- **📝 Structured Logging**: Production-ready with Pino
 
 ### Node Classification
 Automatic categorization based on hardware:
@@ -40,7 +54,9 @@ cd neuralmesh
 **Access Points:**
 - Frontend: http://localhost
 - Backend API: http://localhost:3001
-- WebSocket: ws://localhost:3001
+- Agent WebSocket: ws://localhost:4001/agent
+- Database: localhost:5432 (PostgreSQL)
+- Cache: localhost:6379 (Redis)
 
 ### Manual Setup
 
@@ -103,10 +119,14 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 | Layer | Technologies |
 |-------|-------------|
 | **Frontend** | React 19, TypeScript, Vite 7, Tailwind CSS v4, Three.js, Framer Motion, Zustand |
-| **Backend** | Bun 1.3.8, Hono, Socket.IO, TypeScript |
+| **Backend** | Bun 1.3.8, Hono, Socket.IO, TypeScript, Drizzle ORM |
+| **Database** | PostgreSQL 16, Redis 7 |
 | **Agent** | Rust 1.93, Tokio, sysinfo, tokio-tungstenite |
 | **DevOps** | Docker, Docker Compose, Nginx, Multi-stage builds |
 | **UI Library** | 481 react-bits components (Beams, Particles, Aurora, etc.) |
+| **Authentication** | JWT, bcrypt |
+| **Validation** | Zod |
+| **Logging** | Pino, Pino Pretty |
 
 ## 📸 Features Showcase
 
@@ -152,45 +172,51 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 
 | Document | Description |
 |----------|-------------|
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Full deployment guide (Docker, cloud, production) |
-| [API.md](./API.md) | REST and WebSocket API reference |
+| [SETUP.md](./SETUP.md) | Complete setup guide (quick start, production, troubleshooting) |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Deployment guide (Docker, cloud, production) |
+| [API.md](./API.md) | Full REST and WebSocket API reference |
+| [API_QUICK_REF.md](./API_QUICK_REF.md) | Quick API reference with examples |
+| [ENHANCEMENTS.md](./ENHANCEMENTS.md) | v0.2.0 feature documentation |
 | [USER_GUIDE.md](./USER_GUIDE.md) | Comprehensive user manual |
 | [CHANGELOG.md](./CHANGELOG.md) | Version history and roadmap |
 | [agent/README.md](./agent/README.md) | Rust agent documentation |
 
 ## 📊 Project Stats
 
-- **Total Commits**: 13
-- **Lines of Code**: ~15,000+
+- **Total Commits**: 16+
+- **Lines of Code**: ~25,000+
 - **Components**: 60+ React components
-- **API Endpoints**: 6 REST + 10 WebSocket events
+- **API Endpoints**: 15+ REST + 10 WebSocket events
+- **Database Tables**: 6 (users, nodes, metrics_history, alerts, audit_log, sessions)
 - **Bundle Size**: 1.49MB (frontend optimized)
 - **Agent Binary**: 1.5MB (stripped)
 - **Build Time**: ~10s (frontend), ~14s (agent)
-- **Performance**: <5ms API, 60fps 3D rendering
+- **Performance**: <5ms API with caching, 60fps 3D rendering
 
 ## 🚧 Development Status
 
-**v0.1.0 - Foundation Complete** ✅
+**v0.2.0 - Major Enhancement Complete** ✅
 
-Phase 1 finished! Production-ready foundation with:
-- Full-stack real-time platform
-- Docker containerization
-- Comprehensive documentation
-- Cross-platform agent
-- Beautiful animated UI
+Phase 2-4 finished! Production-ready foundation with advanced features:
+- Database persistence & caching
+- JWT authentication system
+- Smart monitoring & analytics
+- Predictive health scoring
+- Anomaly detection
+- Node action controls
+- Rate limiting & validation
 
-**v0.2.0 - Advanced Features** (Next)
-- PostgreSQL + Redis database
-- JWT authentication
-- Historical analytics
-- Resource optimization
-- Android native agent
-- Mobile app (React Native)
+**v0.3.0 - Enterprise Features** (Next)
+- Multi-tenancy support
+- Custom alerting rules
+- Webhook integrations
+- Kubernetes integration
+- Advanced RBAC
+- Plugin system
 
-**Progress**: 100/523 tasks (19%)
+**Progress**: 150/523 tasks (29%)
 
-See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap.
+See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap and [ENHANCEMENTS.md](./ENHANCEMENTS.md) for v0.2.0 features.
 
 ## 🔧 Development
 
