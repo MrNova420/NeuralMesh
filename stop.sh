@@ -25,7 +25,7 @@ get_port_pids() {
     elif command -v netstat &> /dev/null; then
         netstat -tulpn 2>/dev/null | grep ":$port " | awk '{print $7}' | cut -d'/' -f1
     elif command -v ss &> /dev/null; then
-        ss -tulpn 2>/dev/null | grep ":$port " | grep -oP 'pid=\K[0-9]+'
+        ss -tulpn 2>/dev/null | grep ":$port " | grep -o 'pid=[0-9][0-9]*' | sed 's/.*=//'
     else
         # Fallback: search process list for node/npm on this port
         ps aux | grep -E "node|npm" | grep -v grep | awk '{print $2}'
@@ -75,9 +75,10 @@ stop_port 5174 "Frontend (alternate)"
 # Additional cleanup: stop any remaining node/npm processes from NeuralMesh
 echo
 echo -e "${BLUE}Cleaning up any remaining NeuralMesh processes...${NC}"
-if ps aux | grep -E "neuralmesh|npm run dev" | grep -v grep >/dev/null; then
-    ps aux | grep -E "neuralmesh|npm run dev" | grep -v grep | awk '{print $2}' | while read pid; do
-        kill -15 $pid 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid"
+NEURALMESH_PIDS=$(ps -eo pid,command 2>/dev/null | awk '(/[n]ode/ || /[n]pm/) && /neuralmesh/ {print $1}')
+if [ -n "$NEURALMESH_PIDS" ]; then
+    for pid in $NEURALMESH_PIDS; do
+        kill -15 "$pid" 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid"
     done
 fi
 

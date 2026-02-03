@@ -88,7 +88,7 @@ elif [ "$ENV_TYPE" = "macOS" ]; then
     fi
 else
     # Linux/WSL PostgreSQL
-    if ! sudo service postgresql status | grep -q "active (running)"; then
+    if ! systemctl is-active --quiet postgresql 2>/dev/null; then
         echo -e "  ${YELLOW}→${NC} Starting PostgreSQL service..."
         sudo service postgresql start
         sleep 2
@@ -154,7 +154,8 @@ if PGPASSWORD="$DB_PASSWORD" psql -U "$DB_USER" -d "$DB_NAME" -h localhost -c "S
     echo -e "${GREEN}✓${NC} Database connection successful"
 else
     echo -e "${RED}✗${NC} Database connection failed"
-    echo -e "${YELLOW}Connection string:${NC} postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME"
+    echo -e "${YELLOW}Connection details:${NC} postgresql://$DB_USER:[REDACTED]@localhost:5432/$DB_NAME"
+    echo -e "${YELLOW}Check .db-credentials file for full connection string${NC}"
     exit 1
 fi
 echo
@@ -277,7 +278,8 @@ echo -e "  ${YELLOW}3. View database credentials:${NC}"
 echo -e "     ${GREEN}cat .db-credentials${NC}"
 echo
 echo -e "  ${YELLOW}4. Connect to database:${NC}"
-echo -e "     ${GREEN}PGPASSWORD='$DB_PASSWORD' psql -U $DB_USER -d $DB_NAME -h localhost${NC}"
+echo -e "     ${GREEN}PGPASSWORD='<see .db-credentials>' psql -U $DB_USER -d $DB_NAME -h localhost${NC}"
+echo -e "     ${YELLOW}(Password stored in .db-credentials file)${NC}"
 echo
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}📚 Optimized for: WSL Ubuntu, Termux, Linux, macOS${NC}"

@@ -124,10 +124,10 @@ echo
 echo -e "${BLUE}🔨 Building frontend...${NC}"
 cd "$SCRIPT_DIR/frontend"
 echo -e "  ${YELLOW}→${NC} Compiling TypeScript and React..."
-if npm run build --silent 2>&1 | grep -q "built in"; then
+if npm run build >/dev/null 2>&1; then
     echo -e "${GREEN}✓${NC} Frontend built successfully!"
 else
-    echo -e "${YELLOW}⚠${NC}  Build completed (check for warnings above)"
+    echo -e "${YELLOW}⚠${NC}  Frontend build failed (check error output above)"
 fi
 echo
 
@@ -147,7 +147,7 @@ echo -e "  ${YELLOW}2. Access the frontend:${NC}"
 echo -e "     ${BLUE}http://localhost:5173${NC}"
 echo
 echo -e "  ${YELLOW}3. For full setup with database:${NC}"
-echo -e "     ${GREEN}./setup.sh${NC}"
+echo -e "     ${GREEN}./setup-database.sh${NC}"
 echo
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}📚 Optimized for: WSL Ubuntu, Termux, Linux, macOS${NC}"

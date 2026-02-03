@@ -271,7 +271,7 @@ chmod +x quick-fix.sh && ./quick-fix.sh
 # Open http://localhost:5173
 
 # 5. Later: Full setup with database
-./setup.sh
+./setup-database.sh
 ```
 
 ### For Production Servers:

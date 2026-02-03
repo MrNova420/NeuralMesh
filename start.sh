@@ -15,8 +15,11 @@ port_in_use() {
         netstat -tuln 2>/dev/null | grep -q ":$port "
     elif command -v ss &> /dev/null; then
         ss -tuln 2>/dev/null | grep -q ":$port "
+    elif command -v nc &> /dev/null; then
+        # Fallback: use netcat to test if the port is open
+        nc -z localhost "$port" >/dev/null 2>&1
     else
-        # Fallback: try to bind to the port
+        # Final fallback: try to bind to the port (requires bash)
         (echo >/dev/tcp/localhost/$port) &>/dev/null
     fi
 }

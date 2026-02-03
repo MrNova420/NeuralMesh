@@ -24,7 +24,7 @@ const GameServerControlPage: React.FC = () => {
   const [consoleOutput, setConsoleOutput] = useState<string>('');
   const [command, setCommand] = useState('');
   const [players, setPlayers] = useState<Player[]>([]);
-  const [_files, setFiles] = useState<any[]>([]);
+  const [, setFiles] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('console');
   const [loading, setLoading] = useState(false);

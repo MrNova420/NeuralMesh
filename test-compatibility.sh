@@ -185,7 +185,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 if [ -d "frontend/node_modules" ]; then
     cd frontend
-    if npm run build --silent >/dev/null 2>&1; then
+    if npm run build >/dev/null 2>&1; then
         test_check "Frontend can build" "pass"
     else
         test_check "Frontend can build" "fail"
