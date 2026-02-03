@@ -2,7 +2,7 @@
 
 **Universal Server Orchestration Platform** - Turn any device into a high-performance server node. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
-![Version](https://img.shields.io/badge/version-0.3.0-blue)
+![Version](https://img.shields.io/badge/version-0.4.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
 ![Bun](https://img.shields.io/badge/bun-1.3.8-orange)
@@ -23,14 +23,15 @@
 - **🔄 WebSocket Streaming**: Sub-50ms latency real-time updates
 - **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary, 10-50MB RAM)
 
-### NEW in v0.3.0 🎉
-- **🖥️ Server Management**: Create and manage VMs, containers, bare-metal servers
-- **📝 Server Templates**: Quick deployment with Ubuntu, Debian, Docker, High-perf
-- **🔐 Frontend Auth**: Login, registration, JWT token management
-- **📊 Server Dashboard**: Visual server management interface
-- **🔧 Secrets Tool**: Automated secure secrets generation
-- **♻️ Lifecycle Control**: Start, stop, restart server operations
-- **👤 User Isolation**: Each user manages their own infrastructure
+### NEW in v0.4.0 🎉🚀
+- **🔄 Device Transformation**: Turn ANY device into a high-performance production server
+- **📱 Mobile Edge Servers**: Transform Android phones into edge computing nodes
+- **🕸️ Neural Mesh Control**: Visualize and manage distributed mesh network
+- **⚡ Workload Distribution**: Intelligent distribution across the mesh
+- **🎯 5 Transformation Profiles**: Web, Database, Compute, Storage, Mobile-Edge
+- **📊 Mesh Topology**: Real-time visualization of network connections
+- **🔧 Hardware Optimization**: Real CPU governor, I/O scheduler, network tuning
+- **💪 Production-Grade**: Real optimizations, not fake/minimal implementations
 - **🔐 JWT Authentication**: Secure user management with refresh tokens
 - **💾 PostgreSQL Database**: Persistent storage with historical data
 - **⚡ Redis Caching**: 50-70% faster API responses
@@ -193,11 +194,12 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 
 ## 📊 Project Stats
 
-- **Total Commits**: 20+
-- **Lines of Code**: ~30,000+
-- **Components**: 65+ React components
-- **API Endpoints**: 20+ REST + 10 WebSocket events
+- **Total Commits**: 25+
+- **Lines of Code**: ~35,000+
+- **Components**: 70+ React components
+- **API Endpoints**: 30+ REST + 10 WebSocket events
 - **Database Tables**: 7 (users, nodes, servers, metrics_history, alerts, audit_log, sessions)
+- **Transformation Profiles**: 5 (Web, Database, Compute, Storage, Mobile-Edge)
 - **Bundle Size**: 1.49MB (frontend optimized)
 - **Agent Binary**: 1.5MB (stripped)
 - **Build Time**: ~10s (frontend), ~14s (agent)
@@ -205,25 +207,27 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 
 ## 🚧 Development Status
 
-**v0.3.0 - Server Management & Auth UI** ✅
+**v0.4.0 - Production-Grade Neural Mesh** ✅
 
-Phase 5 & 7 complete! Server management and authentication:
-- Server creation and management
-- Frontend authentication UI
-- User isolation and permissions
-- Server templates and provisioning
-- JWT token auto-refresh
+Revolutionary device transformation and mesh control:
+- Turn any device into production servers
+- Mobile/Android edge computing support
+- Neural mesh network visualization
+- Distributed workload management
+- Real hardware optimization
+- 5 production-grade transformation profiles
 
-**v0.4.0 - Network Mesh & Advanced Features** (Next)
-- Device discovery and auto-registration
-- Network topology visualization
-- Device-to-device communication
-- Advanced analytics dashboards
-- Custom alerting rules
+**v0.5.0 - Cloud Integration & Advanced Features** (Next)
+- Real container orchestration (Kubernetes)
+- Cloud provider APIs (AWS, GCP, Azure)
+- GPU workload distribution
+- Real-time 3D mesh visualization
+- Mobile app for device management
+- Advanced monitoring dashboards
 
-**Progress**: 170/523 tasks (33%)
+**Progress**: 190/523 tasks (36%)
 
-See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap and [FEATURES_GUIDE.md](./FEATURES_GUIDE.md) for complete usage guide.
+See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap.
 
 ## 🔧 Development
 
