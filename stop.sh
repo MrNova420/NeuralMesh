@@ -1,27 +1,85 @@
 #!/bin/bash
+
 # NeuralMesh Stop Script
+# Stops all NeuralMesh services gracefully
 
-echo "🛑 Stopping NeuralMesh..."
-echo ""
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-# Find and stop backend
-BACKEND_PID=$(lsof -ti:3001)
+echo
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}   Stopping NeuralMesh Services${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo
+
+# Function to stop processes on a port
+stop_port() {
+    local port=$1
+    local name=$2
+    
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${YELLOW}Stopping $name (port $port)...${NC}"
+        local pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
+        for pid in $pids; do
+            kill -15 $pid 2>/dev/null && echo -e "${GREEN}✓${NC} Stopped process $pid" || echo -e "${YELLOW}⚠${NC} Process $pid already stopped"
+        done
+        sleep 1
+        
+        # Force kill if still running
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo -e "${YELLOW}Force stopping remaining processes...${NC}"
+            pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
+            for pid in $pids; do
+                kill -9 $pid 2>/dev/null
+            done
+        fi
+    else
+        echo -e "${BLUE}$name (port $port):${NC} ${GREEN}Not running${NC}"
+    fi
+}
+
+# Stop backend on port 3000
+stop_port 3000 "Backend API"
+
+# Stop agent WebSocket on port 3001
+stop_port 3001 "Agent WebSocket"
+
+# Stop frontend on port 5173
+stop_port 5173 "Frontend"
+
+# Stop frontend on port 5174 (fallback port)
+stop_port 5174 "Frontend (alternate)"
+
+# Stop by old port if exists (3001 backend)
+BACKEND_PID=$(lsof -ti:3001 2>/dev/null)
 if [ -n "$BACKEND_PID" ]; then
-    kill $BACKEND_PID
-    echo "✓ Stopped Backend (PID: $BACKEND_PID)"
-else
-    echo "  Backend not running"
+    echo -e "${YELLOW}Stopping legacy backend process...${NC}"
+    kill $BACKEND_PID 2>/dev/null
+    echo -e "${GREEN}✓${NC} Stopped Backend (PID: $BACKEND_PID)"
 fi
 
-# Find and stop frontend
-FRONTEND_PID=$(lsof -ti:5173,5174)
-if [ -n "$FRONTEND_PID" ]; then
-    kill $FRONTEND_PID
-    echo "✓ Stopped Frontend (PID: $FRONTEND_PID)"
-else
-    echo "  Frontend not running"
+# Check if systemd service is running (Linux)
+if command -v systemctl &> /dev/null; then
+    if systemctl is-active --quiet neuralmesh 2>/dev/null; then
+        echo
+        echo -e "${YELLOW}NeuralMesh systemd service is running${NC}"
+        echo -e "To stop it, run: ${GREEN}sudo systemctl stop neuralmesh${NC}"
+    fi
 fi
 
-echo ""
-echo "✅ NeuralMesh stopped"
-echo ""
+echo
+echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}   All NeuralMesh Services Stopped${NC}"
+echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo
+echo -e "${BLUE}📝 Log files preserved:${NC}"
+echo -e "   Backend:  /tmp/neuralmesh-backend.log"
+echo -e "   Frontend: /tmp/neuralmesh-frontend.log"
+echo
+echo -e "${BLUE}🔄 To restart:${NC} ${YELLOW}./start.sh${NC} or ${YELLOW}./quick-start.sh${NC}"
+echo
+
