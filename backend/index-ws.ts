@@ -10,6 +10,8 @@ import authRouter from './src/routes/auth';
 import actionsRouter from './src/routes/actions';
 import analyticsRouter from './src/routes/analytics';
 import serversRouter from './src/routes/servers';
+import deviceRouter from './src/routes/devices';
+import meshRouter from './src/routes/mesh';
 import { setupWebSocket } from './src/websocket/server';
 import { setupAgentWebSocket } from './src/websocket/agentServer';
 import { errorHandler } from './src/middleware/error';
@@ -32,7 +34,7 @@ app.use('/*', cors({
 app.get('/', (c) => {
   return c.json({
     name: 'NeuralMesh API',
-    version: '0.2.0',
+    version: '0.4.0',
     status: 'operational',
     timestamp: new Date().toISOString(),
     websocket: 'enabled',
@@ -45,6 +47,8 @@ app.get('/', (c) => {
       analytics: true,
       caching: true,
       serverManagement: true,
+      deviceTransformation: true,
+      meshControl: true,
     },
   });
 });
@@ -57,6 +61,8 @@ app.route('/api/status', statusRouter);
 app.route('/api/actions', actionsRouter);
 app.route('/api/analytics', analyticsRouter);
 app.route('/api/servers', serversRouter);
+app.route('/api/devices', deviceRouter);
+app.route('/api/mesh', meshRouter);
 
 // 404 handler
 app.notFound((c) => {

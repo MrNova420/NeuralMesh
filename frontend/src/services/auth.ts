@@ -117,6 +117,21 @@ export const apiService = {
   stopServer: (id: string) => api.post(`/api/servers/${id}/stop`),
   restartServer: (id: string) => api.post(`/api/servers/${id}/restart`),
   getServerTemplates: () => api.get('/api/servers/templates/list'),
+
+  // Device Transformation
+  analyzeDevice: (nodeId: string) => api.get(`/api/devices/${nodeId}/capabilities`),
+  getTransformationProfiles: () => api.get('/api/devices/transformation/profiles'),
+  startTransformation: (nodeId: string, profileId: string) =>
+    api.post(`/api/devices/${nodeId}/transform`, { profileId }),
+  getTransformationStatus: (nodeId: string) =>
+    api.get(`/api/devices/${nodeId}/transformation/status`),
+
+  // Mesh Control
+  getMeshTopology: () => api.get('/api/mesh/topology'),
+  distributeWorkload: (type: string, resources: any) =>
+    api.post('/api/mesh/workload/distribute', { type, resources }),
+  getWorkloadStatus: (id: string) => api.get(`/api/mesh/workload/${id}`),
+  getAllWorkloads: () => api.get('/api/mesh/workload'),
 };
 
 export default apiService;
