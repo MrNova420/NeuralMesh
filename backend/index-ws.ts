@@ -101,8 +101,8 @@ app.onError((err, c) => {
   return c.json({ error: err.message }, 500);
 });
 
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
-const agentPort = process.env.AGENT_PORT ? parseInt(process.env.AGENT_PORT) : 4001;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const agentPort = process.env.AGENT_PORT ? parseInt(process.env.AGENT_PORT) : 3001;
 
 // Test database connection on startup
 testDatabaseConnection().then((connected) => {

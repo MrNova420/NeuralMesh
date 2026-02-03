@@ -5,10 +5,10 @@ const API_BASE_URL =
   (() => {
     try {
       const url = new URL(window.location.href);
-      url.port = '3001';
+      url.port = '3000';
       return url.origin;
     } catch {
-      return 'http://localhost:3001';
+      return 'http://localhost:3000';
     }
   })();
 
