@@ -2,7 +2,7 @@
 
 **Universal Server Orchestration Platform** - Turn any device into a high-performance server node. Built with Neural Network-inspired architecture for intelligent resource management and distributed computing.
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
 ![Bun](https://img.shields.io/badge/bun-1.3.8-orange)
@@ -23,7 +23,14 @@
 - **🔄 WebSocket Streaming**: Sub-50ms latency real-time updates
 - **🦀 Rust Performance**: Ultra-lightweight agent (1.5MB binary, 10-50MB RAM)
 
-### NEW in v0.2.0 🎉
+### NEW in v0.3.0 🎉
+- **🖥️ Server Management**: Create and manage VMs, containers, bare-metal servers
+- **📝 Server Templates**: Quick deployment with Ubuntu, Debian, Docker, High-perf
+- **🔐 Frontend Auth**: Login, registration, JWT token management
+- **📊 Server Dashboard**: Visual server management interface
+- **🔧 Secrets Tool**: Automated secure secrets generation
+- **♻️ Lifecycle Control**: Start, stop, restart server operations
+- **👤 User Isolation**: Each user manages their own infrastructure
 - **🔐 JWT Authentication**: Secure user management with refresh tokens
 - **💾 PostgreSQL Database**: Persistent storage with historical data
 - **⚡ Redis Caching**: 50-70% faster API responses
@@ -173,21 +180,24 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 | Document | Description |
 |----------|-------------|
 | [SETUP.md](./SETUP.md) | Complete setup guide (quick start, production, troubleshooting) |
+| [FEATURES_GUIDE.md](./FEATURES_GUIDE.md) | Complete v0.3.0 features and usage guide |
+| [SERVER_MANAGEMENT.md](./SERVER_MANAGEMENT.md) | Server management API and best practices |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Deployment guide (Docker, cloud, production) |
 | [API.md](./API.md) | Full REST and WebSocket API reference |
 | [API_QUICK_REF.md](./API_QUICK_REF.md) | Quick API reference with examples |
 | [ENHANCEMENTS.md](./ENHANCEMENTS.md) | v0.2.0 feature documentation |
+| [SECURITY.md](./SECURITY.md) | Security analysis and recommendations |
 | [USER_GUIDE.md](./USER_GUIDE.md) | Comprehensive user manual |
 | [CHANGELOG.md](./CHANGELOG.md) | Version history and roadmap |
 | [agent/README.md](./agent/README.md) | Rust agent documentation |
 
 ## 📊 Project Stats
 
-- **Total Commits**: 16+
-- **Lines of Code**: ~25,000+
-- **Components**: 60+ React components
-- **API Endpoints**: 15+ REST + 10 WebSocket events
-- **Database Tables**: 6 (users, nodes, metrics_history, alerts, audit_log, sessions)
+- **Total Commits**: 20+
+- **Lines of Code**: ~30,000+
+- **Components**: 65+ React components
+- **API Endpoints**: 20+ REST + 10 WebSocket events
+- **Database Tables**: 7 (users, nodes, servers, metrics_history, alerts, audit_log, sessions)
 - **Bundle Size**: 1.49MB (frontend optimized)
 - **Agent Binary**: 1.5MB (stripped)
 - **Build Time**: ~10s (frontend), ~14s (agent)
@@ -195,28 +205,25 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions, cloud deployment
 
 ## 🚧 Development Status
 
-**v0.2.0 - Major Enhancement Complete** ✅
+**v0.3.0 - Server Management & Auth UI** ✅
 
-Phase 2-4 finished! Production-ready foundation with advanced features:
-- Database persistence & caching
-- JWT authentication system
-- Smart monitoring & analytics
-- Predictive health scoring
-- Anomaly detection
-- Node action controls
-- Rate limiting & validation
+Phase 5 & 7 complete! Server management and authentication:
+- Server creation and management
+- Frontend authentication UI
+- User isolation and permissions
+- Server templates and provisioning
+- JWT token auto-refresh
 
-**v0.3.0 - Enterprise Features** (Next)
-- Multi-tenancy support
+**v0.4.0 - Network Mesh & Advanced Features** (Next)
+- Device discovery and auto-registration
+- Network topology visualization
+- Device-to-device communication
+- Advanced analytics dashboards
 - Custom alerting rules
-- Webhook integrations
-- Kubernetes integration
-- Advanced RBAC
-- Plugin system
 
-**Progress**: 150/523 tasks (29%)
+**Progress**: 170/523 tasks (33%)
 
-See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap and [ENHANCEMENTS.md](./ENHANCEMENTS.md) for v0.2.0 features.
+See [CHANGELOG.md](./CHANGELOG.md) for detailed roadmap and [FEATURES_GUIDE.md](./FEATURES_GUIDE.md) for complete usage guide.
 
 ## 🔧 Development
 
