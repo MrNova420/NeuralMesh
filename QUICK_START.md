@@ -131,46 +131,38 @@ You'll see:
 
 Let's connect a device to your NeuralMesh!
 
-### Step 1: Generate a Pairing Code
+### Quick Method (Recommended)
 
-1. Click **"Devices"** in the sidebar
-2. Click **"+ Add Device"**
-3. A pairing code appears (e.g., `ABCD-1234-EFGH`)
-4. **Keep this page open!**
+1. **In Dashboard:** Click "Devices" → "+ Add Device"
+2. **Copy pairing code** (e.g., `ABCD-1234-EFGH`)
+3. **On device:** Run one command:
 
-### Step 2: Install Agent on Device
-
-**On the device you want to add** (can be the same computer):
-
-**Linux/macOS:**
+**Linux/macOS/Termux:**
 ```bash
-# Note: This downloads and runs a script. Review the script first if concerned:
-# curl -fsSL http://localhost:3000/install-agent.sh -o install-agent.sh
-# cat install-agent.sh  # Review the script
-# bash install-agent.sh --pairing-code YOUR_CODE
-
-# Quick install (trusted source):
-curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code YOUR_CODE
+curl -fsSL http://YOUR_SERVER_IP:3000/install-agent.sh | bash -s -- --pairing-code ABCD-1234-EFGH
 ```
 
-**Windows:**
+**Windows (PowerShell):**
 ```powershell
-# Download and review first (recommended for security)
-Invoke-WebRequest http://localhost:3000/install-agent.ps1 -OutFile agent.ps1
-# Review agent.ps1 content
-.\agent.ps1 -PairingCode YOUR_CODE
+Invoke-WebRequest http://YOUR_SERVER_IP:3000/install-agent.ps1 -OutFile agent.ps1
+.\agent.ps1 -PairingCode "ABCD-1234-EFGH"
 ```
 
-Replace `YOUR_CODE` with your actual pairing code!
+Replace:
+- `YOUR_SERVER_IP` with your server IP (`localhost` if same device)
+- `ABCD-1234-EFGH` with your actual pairing code
 
-> ⚠️ **Security Note**: Piping remote scripts to bash/PowerShell executes them immediately. For production deployments, download and review scripts before running them.
+**Done!** Device connects in seconds! 🎊
 
-### Step 3: Watch It Connect! 🎊
+### Need More Control?
 
-Within seconds, you'll see:
-- ✅ Device appears in your device list
-- 📊 Real-time metrics start flowing
-- 🌐 Neural network visualization updates
+📚 **See [Device Management Guide](./DEVICE_MANAGEMENT.md)** for:
+- Manual installation
+- Configuration options
+- Multiple devices
+- Android/Raspberry Pi setup
+- Service management
+- Troubleshooting
 
 ---
 
