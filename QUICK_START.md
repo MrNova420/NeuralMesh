@@ -144,16 +144,26 @@ Let's connect a device to your NeuralMesh!
 
 **Linux/macOS:**
 ```bash
+# Note: This downloads and runs a script. Review the script first if concerned:
+# curl -fsSL http://localhost:3000/install-agent.sh -o install-agent.sh
+# cat install-agent.sh  # Review the script
+# bash install-agent.sh --pairing-code YOUR_CODE
+
+# Quick install (trusted source):
 curl -fsSL http://localhost:3000/install-agent.sh | bash -s -- --pairing-code YOUR_CODE
 ```
 
 **Windows:**
 ```powershell
+# Download and review first (recommended for security)
 Invoke-WebRequest http://localhost:3000/install-agent.ps1 -OutFile agent.ps1
+# Review agent.ps1 content
 .\agent.ps1 -PairingCode YOUR_CODE
 ```
 
 Replace `YOUR_CODE` with your actual pairing code!
+
+> ⚠️ **Security Note**: Piping remote scripts to bash/PowerShell executes them immediately. For production deployments, download and review scripts before running them.
 
 ### Step 3: Watch It Connect! 🎊
 

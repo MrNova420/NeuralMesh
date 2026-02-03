@@ -128,11 +128,15 @@ echo -e "${GREEN}✓${NC} Frontend dependencies installed"
 echo
 echo -e "${BLUE}Checking database...${NC}"
 cd "$SCRIPT_DIR/backend"
-if npm run db:push 2>&1 | grep -q "error"; then
-    echo -e "${YELLOW}⚠${NC} Database migration had issues"
-    echo -e "  You may need to run: ${YELLOW}./setup.sh${NC} for full database setup"
-else
+
+# Run migration and capture exit code
+if npm run db:push > /tmp/neuralmesh-migration-check.log 2>&1; then
     echo -e "${GREEN}✓${NC} Database is ready"
+else
+    EXIT_CODE=$?
+    echo -e "${YELLOW}⚠${NC} Database migration had issues (exit code: $EXIT_CODE)"
+    echo -e "  You may need to run: ${YELLOW}./setup.sh${NC} for full database setup"
+    echo -e "  Or check logs: ${YELLOW}cat /tmp/neuralmesh-migration-check.log${NC}"
 fi
 
 # Start services

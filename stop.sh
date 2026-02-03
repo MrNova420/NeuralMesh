@@ -54,12 +54,12 @@ stop_port 5173 "Frontend"
 # Stop frontend on port 5174 (fallback port)
 stop_port 5174 "Frontend (alternate)"
 
-# Stop by old port if exists (3001 backend)
-BACKEND_PID=$(lsof -ti:3001 2>/dev/null)
-if [ -n "$BACKEND_PID" ]; then
-    echo -e "${YELLOW}Stopping legacy backend process...${NC}"
-    kill $BACKEND_PID 2>/dev/null
-    echo -e "${GREEN}✓${NC} Stopped Backend (PID: $BACKEND_PID)"
+# Stop by legacy port configuration if exists
+LEGACY_BACKEND_PID=$(lsof -ti:3001 2>/dev/null)
+if [ -n "$LEGACY_BACKEND_PID" ]; then
+    echo -e "${YELLOW}Stopping legacy backend process (old port 3001)...${NC}"
+    kill $LEGACY_BACKEND_PID 2>/dev/null
+    echo -e "${GREEN}✓${NC} Stopped legacy backend (PID: $LEGACY_BACKEND_PID)"
 fi
 
 # Check if systemd service is running (Linux)

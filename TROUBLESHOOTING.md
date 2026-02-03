@@ -15,11 +15,11 @@ This guide helps you resolve common installation and deployment issues.
 
 ## Installation Issues
 
-### Issue: "cho: command not found"
+### Issue: "echo: command not found"
 
 **Symptoms:**
 ```
-bash: line 65: cho: command not found
+bash: line 65: echo: command not found
 ```
 
 **Solution:**

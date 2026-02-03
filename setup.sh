@@ -620,6 +620,8 @@ echo -e "   User:          ${GREEN}$DB_USER${NC} ${YELLOW}(FULL OWNER)${NC}"
 echo -e "   Password:      ${GREEN}$DB_PASSWORD${NC}"
 echo -e "   Host:          ${GREEN}localhost:5432${NC}"
 echo
+echo -e "${YELLOW}⚠️  Security Note: Password shown above. Consider clearing terminal history.${NC}"
+echo
 echo -e "${BLUE}🔑 Quick Access Commands:${NC}"
 echo -e "   Connect:       ${YELLOW}psql -U $DB_USER -d $DB_NAME${NC}"
 echo -e "   With password: ${YELLOW}PGPASSWORD='$DB_PASSWORD' psql -U $DB_USER -d $DB_NAME${NC}"
