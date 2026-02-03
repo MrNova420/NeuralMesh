@@ -11,8 +11,8 @@ COPY backend/src ./src
 COPY backend/index-ws.ts ./index-ws.ts
 COPY backend/tsconfig.json ./tsconfig.json
 
-# Expose WebSocket port
-EXPOSE 3001
+# Expose API and WebSocket ports
+EXPOSE 3000 3001
 
 # Run the server
 CMD ["bun", "run", "index-ws.ts"]
