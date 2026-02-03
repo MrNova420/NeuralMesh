@@ -8,13 +8,13 @@ interface Node {
   name: string;
   type: 'alpha' | 'beta' | 'gamma' | 'delta';
   status: 'healthy' | 'warning' | 'critical' | 'offline';
-  specs: {
+  specs?: {
     cpu: { cores: number; usage: number };
     memory: { usage: number };
     storage: { usage: number };
   };
   platform: {
-    os: string;
+    os?: string;
     hostname: string;
   };
 }
@@ -65,7 +65,7 @@ export const DeviceGrid: FC<DeviceGridProps> = ({ nodes, onNodeClick }) => {
             {node.name}
           </h3>
           <p className="text-xs text-neutral-text-secondary mb-3 truncate">
-            {node.platform.hostname} • {node.platform.os}
+            {node.platform.hostname}{node.platform.os && ` • ${node.platform.os}`}
           </p>
 
           {/* Type badge */}
@@ -76,11 +76,13 @@ export const DeviceGrid: FC<DeviceGridProps> = ({ nodes, onNodeClick }) => {
           </div>
 
           {/* Metrics bars */}
-          <div className="space-y-2">
-            <MetricBar label="CPU" value={node.specs.cpu.usage} cores={node.specs.cpu.cores} />
-            <MetricBar label="MEM" value={node.specs.memory.usage} />
-            <MetricBar label="DSK" value={node.specs.storage.usage} />
-          </div>
+          {node.specs && (
+            <div className="space-y-2">
+              <MetricBar label="CPU" value={node.specs.cpu.usage} cores={node.specs.cpu.cores} />
+              <MetricBar label="MEM" value={node.specs.memory.usage} />
+              <MetricBar label="DSK" value={node.specs.storage.usage} />
+            </div>
+          )}
 
           {/* Hover effect overlay */}
           <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />

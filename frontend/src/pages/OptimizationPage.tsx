@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { useState } from 'react';
 
 interface OptimizationSettings {
   cpuGovernor: 'performance' | 'balanced' | 'powersave';
@@ -28,7 +27,7 @@ export default function OptimizationPage() {
     maxConnections: 1000,
   });
 
-  const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([
+  const [suggestions] = useState<OptimizationSuggestion[]>([
     {
       type: 'resource',
       title: 'Right-size instances',

@@ -9,23 +9,23 @@ interface NodeDetailModalProps {
     name: string;
     type: 'alpha' | 'beta' | 'gamma' | 'delta';
     status: 'healthy' | 'warning' | 'critical' | 'offline';
-    specs: {
-      cpu: { cores: number; usage: number; model: string };
-      memory: { total: number; used: number; usage: number };
-      storage: { total: number; used: number; usage: number };
-      network: { rx: number; tx: number };
+    specs?: {
+      cpu: { cores: number; usage: number; model?: string };
+      memory: { total?: number; used?: number; usage: number };
+      storage: { total?: number; used?: number; usage: number };
+      network?: { rx: number; tx: number };
     };
     platform: {
-      os: string;
-      arch: string;
+      os?: string;
+      arch?: string;
       hostname: string;
     };
     location: {
-      region: string;
+      region?: string;
       ip: string;
     };
-    connections: string[];
-    uptime: number;
+    connections?: string[];
+    uptime?: number;
   } | null;
   isOpen: boolean;
   onClose: () => void;
@@ -105,66 +105,70 @@ export const NodeDetailModal: FC<NodeDetailModalProps> = ({ node, isOpen, onClos
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <StatCard label="Type" value={node.type.toUpperCase()} />
                   <StatCard label="Status" value={node.status} />
-                  <StatCard label="Uptime" value={formatUptime(node.uptime)} />
-                  <StatCard label="Connections" value={node.connections.length} />
+                  <StatCard label="Uptime" value={node.uptime ? formatUptime(node.uptime) : 'N/A'} />
+                  <StatCard label="Connections" value={node.connections?.length || 0} />
                 </div>
 
                 {/* System Specs */}
-                <Section title="System Specifications">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <SpecCard
-                      icon="💻"
-                      title="CPU"
-                      details={[
-                        `${node.specs.cpu.cores} cores`,
-                        node.specs.cpu.model,
-                        `${node.specs.cpu.usage.toFixed(1)}% usage`,
-                      ]}
-                      usage={node.specs.cpu.usage}
-                    />
-                    <SpecCard
-                      icon="🧠"
-                      title="Memory"
-                      details={[
-                        formatBytes(node.specs.memory.total),
-                        `${formatBytes(node.specs.memory.used)} used`,
-                        `${node.specs.memory.usage.toFixed(1)}% usage`,
-                      ]}
-                      usage={node.specs.memory.usage}
-                    />
-                    <SpecCard
-                      icon="💾"
-                      title="Storage"
-                      details={[
-                        formatBytes(node.specs.storage.total),
-                        `${formatBytes(node.specs.storage.used)} used`,
-                        `${node.specs.storage.usage.toFixed(1)}% usage`,
-                      ]}
-                      usage={node.specs.storage.usage}
-                    />
-                    <SpecCard
-                      icon="🌐"
-                      title="Network"
-                      details={[
-                        `↓ ${node.specs.network.rx.toFixed(1)} MB/s`,
-                        `↑ ${node.specs.network.tx.toFixed(1)} MB/s`,
-                        `Total: ${(node.specs.network.rx + node.specs.network.tx).toFixed(1)} MB/s`,
-                      ]}
-                    />
-                  </div>
-                </Section>
+                {node.specs && (
+                  <Section title="System Specifications">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <SpecCard
+                        icon="💻"
+                        title="CPU"
+                        details={[
+                          `${node.specs.cpu.cores} cores`,
+                          node.specs.cpu.model || 'N/A',
+                          `${node.specs.cpu.usage.toFixed(1)}% usage`,
+                        ]}
+                        usage={node.specs.cpu.usage}
+                      />
+                      <SpecCard
+                        icon="🧠"
+                        title="Memory"
+                        details={[
+                          node.specs.memory.total ? formatBytes(node.specs.memory.total) : 'N/A',
+                          node.specs.memory.used ? `${formatBytes(node.specs.memory.used)} used` : 'N/A',
+                          `${node.specs.memory.usage.toFixed(1)}% usage`,
+                        ]}
+                        usage={node.specs.memory.usage}
+                      />
+                      <SpecCard
+                        icon="💾"
+                        title="Storage"
+                        details={[
+                          node.specs.storage.total ? formatBytes(node.specs.storage.total) : 'N/A',
+                          node.specs.storage.used ? `${formatBytes(node.specs.storage.used)} used` : 'N/A',
+                          `${node.specs.storage.usage.toFixed(1)}% usage`,
+                        ]}
+                        usage={node.specs.storage.usage}
+                      />
+                      {node.specs.network && (
+                        <SpecCard
+                          icon="🌐"
+                          title="Network"
+                          details={[
+                            `↓ ${node.specs.network.rx.toFixed(1)} MB/s`,
+                            `↑ ${node.specs.network.tx.toFixed(1)} MB/s`,
+                            `Total: ${(node.specs.network.rx + node.specs.network.tx).toFixed(1)} MB/s`,
+                          ]}
+                        />
+                      )}
+                    </div>
+                  </Section>
+                )}
 
                 {/* Platform Info */}
                 <Section title="Platform Information">
                   <div className="grid md:grid-cols-3 gap-4">
-                    <InfoItem label="Operating System" value={node.platform.os} />
-                    <InfoItem label="Architecture" value={node.platform.arch} />
-                    <InfoItem label="Region" value={node.location.region} />
+                    <InfoItem label="Operating System" value={node.platform.os || 'N/A'} />
+                    <InfoItem label="Architecture" value={node.platform.arch || 'N/A'} />
+                    <InfoItem label="Region" value={node.location.region || 'N/A'} />
                   </div>
                 </Section>
 
                 {/* Connections */}
-                {node.connections.length > 0 && (
+                {node.connections && node.connections.length > 0 && (
                   <Section title="Connected Nodes">
                     <div className="flex flex-wrap gap-2">
                       {node.connections.map((conn) => (

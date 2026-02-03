@@ -163,7 +163,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
 
   useEffect(() => {
     setSvgSupported(supportsSVGFilters());
-  }, [supportsSVGFilters]);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
