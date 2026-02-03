@@ -8,18 +8,21 @@ Turn any device into a high-performance server node. No subscription fees, no ho
 
 ## 🚨 PROJECT BROKEN? START HERE! 
 
-**If nothing works after cloning**, run this **ONE command** to fix everything:
+**If nothing works after cloning**, choose based on your needs:
 
+### Option A: Quick Test (No Database - 2 minutes)
 ```bash
 chmod +x quick-fix.sh && ./quick-fix.sh
-```
-
-**Then start the app:**
-```bash
 ./start.sh
 ```
 
-**📖 See all installation methods:** [INSTALL_METHODS.md](./INSTALL_METHODS.md)
+### Option B: Full Setup with Database (10 minutes) 
+```bash
+chmod +x setup-database.sh && ./setup-database.sh
+./start.sh
+```
+
+**📖 See all methods:** [INSTALL_METHODS.md](./INSTALL_METHODS.md)
 
 ---
 
@@ -121,9 +124,9 @@ Automatic categorization based on hardware:
 
 ## 📦 Quick Start
 
-### 🚀 FASTEST: Quick Fix (2 minutes)
+### 🚀 FASTEST: Quick Fix (2 minutes - No Database)
 
-**For WSL Ubuntu, Termux, or any Linux/macOS when you just want it working:**
+**For testing without database:**
 
 ```bash
 git clone https://github.com/MrNova420/NeuralMesh.git
@@ -133,7 +136,27 @@ chmod +x quick-fix.sh && ./quick-fix.sh
 ```
 
 **Access:** http://localhost:5173  
-**Time:** ~2 minutes (no database required)
+**Time:** ~2 minutes
+
+### 🗄️ RECOMMENDED: Full Database Setup (10 minutes)
+
+**For complete functionality with PostgreSQL:**
+
+```bash
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+chmod +x setup-database.sh && ./setup-database.sh
+./start.sh
+```
+
+**Includes:**
+- ✅ PostgreSQL database setup
+- ✅ User authentication
+- ✅ Device management  
+- ✅ Historical metrics
+- ✅ All features enabled
+
+**Time:** ~10 minutes
 
 ### ⚡ One-Click Full Installation (10 minutes)
 

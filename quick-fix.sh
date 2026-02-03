@@ -77,16 +77,21 @@ echo
 # Create minimal backend .env for development (without database)
 echo -e "${BLUE}⚙️  Creating development configuration...${NC}"
 if [ ! -f "$SCRIPT_DIR/backend/.env" ]; then
-    cat > "$SCRIPT_DIR/backend/.env" << 'EOF'
+    # Generate random secrets for development
+    DEV_JWT_SECRET=$(openssl rand -base64 32 | tr -d /=+ | cut -c1-32 2>/dev/null || echo "dev_secret_$(date +%s)_please_run_setup_for_production")
+    DEV_REFRESH_SECRET=$(openssl rand -base64 32 | tr -d /=+ | cut -c1-32 2>/dev/null || echo "dev_refresh_$(date +%s)_please_run_setup_for_production")
+    
+    cat > "$SCRIPT_DIR/backend/.env" << EOF
 # Development Configuration (Minimal - No Database Required)
 PORT=3000
 AGENT_PORT=3001
 NODE_ENV=development
 LOG_LEVEL=info
 
-# JWT Secrets (Development Only - Change for Production!)
-JWT_SECRET=dev_secret_change_this_in_production_please_use_setup_script
-JWT_REFRESH_SECRET=dev_refresh_secret_change_this_too_please_use_setup_script
+# JWT Secrets (Development - GENERATED RANDOMLY)
+# ⚠️  WARNING: For production, run ./setup.sh to generate secure secrets
+JWT_SECRET=${DEV_JWT_SECRET}
+JWT_REFRESH_SECRET=${DEV_REFRESH_SECRET}
 
 # Database (Optional - Will work without it for basic testing)
 # Run setup.sh for full database setup
@@ -96,7 +101,7 @@ DATABASE_URL=postgresql://neuralmesh:neuralmesh@localhost:5432/neuralmesh
 REDIS_HOST=localhost
 REDIS_PORT=6379
 EOF
-    echo -e "${GREEN}✓${NC} Backend .env created (development mode)"
+    echo -e "${GREEN}✓${NC} Backend .env created (development mode with random secrets)"
 else
     echo -e "${GREEN}✓${NC} Backend .env already exists"
 fi

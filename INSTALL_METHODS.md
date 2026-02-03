@@ -8,27 +8,70 @@ This document explains ALL installation methods available for NeuralMesh and whe
 
 ## 📋 Quick Reference
 
-| Method | Best For | Time | Prerequisites |
-|--------|----------|------|---------------|
-| **quick-fix.sh** | Getting it working NOW | 2-3 min | Node.js only |
-| **install.sh** | Full production setup | 10-15 min | sudo access |
-| **setup.sh** | Already cloned repo | 10-15 min | sudo access |
-| **quick-start.sh** | Development work | 5 min | PostgreSQL, Redis |
-| **Docker Compose** | Isolated environment | 2-3 min | Docker |
-| **Manual** | Custom setup | 15+ min | All tools |
+| Method | Best For | Time | Database | Prerequisites |
+|--------|----------|------|----------|---------------|
+| **setup-database.sh** | Full setup with DB | 10 min | ✅ Yes | PostgreSQL (auto-starts) |
+| **quick-fix.sh** | Quick test, no DB | 2-3 min | ❌ No | Node.js only |
+| **install.sh** | Production + services | 10-15 min | ✅ Yes | sudo access |
+| **setup.sh** | Already cloned repo | 10-15 min | ✅ Yes | sudo access |
+| **quick-start.sh** | Development work | 5 min | ✅ Yes | PostgreSQL, Redis |
+| **Docker Compose** | Isolated environment | 2-3 min | ✅ Yes | Docker |
+| **Manual** | Custom setup | 15+ min | ✅ Yes | All tools |
 
 ---
 
-## 🔧 Method 1: Quick Fix (FASTEST - No Database Required)
+## 🗄️ Method 1: Database Setup Script (RECOMMENDED)
 
-**Perfect for:** WSL Ubuntu, Termux, getting it working immediately
+**Perfect for:** Complete functionality with database, WSL/Termux/Linux/macOS
+
+**What it does:**
+- ✅ Starts PostgreSQL (handles Termux/WSL/macOS differences)
+- ✅ Creates database and user
+- ✅ Sets proper permissions
+- ✅ Installs backend dependencies
+- ✅ Generates secure secrets
+- ✅ Runs database migrations
+- ✅ Creates .env files
+- ✅ Verifies everything works
+- ✅ Saves credentials securely
+
+**Usage:**
+```bash
+# Clone or download the repo first
+git clone https://github.com/MrNova420/NeuralMesh.git
+cd NeuralMesh
+
+# Run database setup
+chmod +x setup-database.sh
+./setup-database.sh
+
+# Start the application
+./start.sh
+```
+
+**Access:** http://localhost:5173
+
+**Time:** 10 minutes
+
+**Includes:**
+- User authentication ✅
+- Device management ✅
+- Historical metrics ✅
+- Persistent storage ✅
+- All features enabled ✅
+
+---
+
+## 🔧 Method 2: Quick Fix (NO Database)
+
+**Perfect for:** Quick testing, development without database
 
 **What it does:**
 - ✅ Installs frontend dependencies
 - ✅ Installs backend dependencies
-- ✅ Creates minimal .env files
+- ✅ Creates minimal .env files (random dev secrets)
 - ✅ Builds frontend
-- ❌ Does NOT install PostgreSQL/Redis (optional)
+- ❌ Does NOT install PostgreSQL/Redis
 - ❌ Does NOT require sudo
 
 **Usage:**
@@ -48,6 +91,8 @@ chmod +x quick-fix.sh
 **Access:** http://localhost:5173
 
 **Time:** 2-3 minutes
+
+**Note:** Frontend works, but features requiring database won't function.
 
 ---
 
@@ -298,20 +343,23 @@ npm run dev
 
 ## 🎯 Recommended Path by Use Case
 
-### Just Want It Working Now
+### Just Want It Working With Full Features
+→ **setup-database.sh** (10 min, includes database)
+
+### Just Testing / No Database Needed
 → **quick-fix.sh** (2 min, no DB)
 
 ### Production Server
-→ **install.sh** (10 min, full setup)
+→ **install.sh** (15 min, full system setup)
 
 ### Development
-→ **quick-start.sh** (5 min) or **Docker Compose** (2 min)
+→ **setup-database.sh** (10 min) or **quick-start.sh** (5 min, needs DB running)
 
 ### WSL Ubuntu
-→ **quick-fix.sh** then upgrade to **setup.sh** later
+→ **setup-database.sh** for full features, **quick-fix.sh** for testing
 
 ### Termux
-→ **quick-fix.sh** for testing, **install.sh** for full
+→ **setup-database.sh** (handles Termux PostgreSQL setup)
 
 ### Understanding the Code
 → **Manual Installation** (follow along)
@@ -323,10 +371,10 @@ npm run dev
 Start simple, upgrade later:
 
 ```
-quick-fix.sh → setup.sh → Full customization
-     ↓            ↓              ↓
-  2 min       10 min        Custom
-  No DB     Full setup      Your way
+quick-fix.sh → setup-database.sh → Full production setup
+     ↓              ↓                       ↓
+  2 min          10 min                 15 min
+  No DB       Full DB setup          Full services
 ```
 
 ---
